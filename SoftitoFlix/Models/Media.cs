@@ -19,5 +19,6 @@ namespace SoftitoFlix.Models
         public List<Media_Restriction>? Media_Restrictions { get; set; }
         [Range(0,10)]
         public float Rating { get; set; }
+        public bool Passive { get; set; } 
     }
 }

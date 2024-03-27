@@ -2,14 +2,13 @@
 
 namespace SoftitoFlix.Models
 {
-	public class Media_Restriction
+	public class User_Favorite
 	{
+        public long UserId { get; set; }
         public int MediaId { get; set; }
-        public byte RestrictionId { get; set; }
+        [ForeignKey("UserId")]
+        public ApplicationUser? ApplicationUser { get; set; }
         [ForeignKey("MediaId")]
         public Media? Media { get; set; }
-        [ForeignKey("RestrictionId")]
-        public Restriction? Restriction { get; set; }
     }
 }
-

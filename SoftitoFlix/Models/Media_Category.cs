@@ -10,7 +10,6 @@ namespace SoftitoFlix.Models
 		public Category? Category { get; set; }
 		[ForeignKey("MediaId")]
 		public Media? Media { get; set; }
-
-	}
+    }
 }
 

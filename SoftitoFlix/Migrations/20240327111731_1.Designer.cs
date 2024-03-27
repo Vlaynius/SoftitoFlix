@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SoftitoFlix.Data;
 
@@ -11,9 +12,11 @@ using SoftitoFlix.Data;
 namespace SoftitoFlix.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240327111731_1")]
+    partial class _1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -253,7 +256,7 @@ namespace SoftitoFlix.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.Director", b =>
@@ -271,7 +274,7 @@ namespace SoftitoFlix.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Directors", (string)null);
+                    b.ToTable("Directors");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.Episode", b =>
@@ -317,7 +320,7 @@ namespace SoftitoFlix.Migrations
                     b.HasIndex("MediaId", "SeasonNumber", "EpisodeNumber")
                         .IsUnique();
 
-                    b.ToTable("Episodes", (string)null);
+                    b.ToTable("Episodes");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.Media", b =>
@@ -346,7 +349,7 @@ namespace SoftitoFlix.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Medias", (string)null);
+                    b.ToTable("Medias");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.Media_Category", b =>
@@ -361,7 +364,7 @@ namespace SoftitoFlix.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Media_Categories", (string)null);
+                    b.ToTable("Media_Categories");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.Media_Director", b =>
@@ -376,7 +379,7 @@ namespace SoftitoFlix.Migrations
 
                     b.HasIndex("DirectorId");
 
-                    b.ToTable("Media_Directors", (string)null);
+                    b.ToTable("Media_Directors");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.Media_Restriction", b =>
@@ -391,7 +394,7 @@ namespace SoftitoFlix.Migrations
 
                     b.HasIndex("RestrictionId");
 
-                    b.ToTable("Media_Restrictions", (string)null);
+                    b.ToTable("Media_Restrictions");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.Media_Star", b =>
@@ -406,7 +409,7 @@ namespace SoftitoFlix.Migrations
 
                     b.HasIndex("StarId");
 
-                    b.ToTable("Media_Stars", (string)null);
+                    b.ToTable("Media_Stars");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.Plan", b =>
@@ -432,7 +435,7 @@ namespace SoftitoFlix.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Plans", (string)null);
+                    b.ToTable("Plans");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.Restriction", b =>
@@ -447,7 +450,7 @@ namespace SoftitoFlix.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Restrictions", (string)null);
+                    b.ToTable("Restrictions");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.Star", b =>
@@ -465,7 +468,7 @@ namespace SoftitoFlix.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Stars", (string)null);
+                    b.ToTable("Stars");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.User_Favorite", b =>
@@ -480,7 +483,7 @@ namespace SoftitoFlix.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("User_Favorites", (string)null);
+                    b.ToTable("User_Favorites");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.User_Plan", b =>
@@ -514,7 +517,7 @@ namespace SoftitoFlix.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("User_Plans", (string)null);
+                    b.ToTable("User_Plans");
                 });
 
             modelBuilder.Entity("SoftitoFlix.Models.User_Watched", b =>
@@ -529,7 +532,7 @@ namespace SoftitoFlix.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("User_Watcheds", (string)null);
+                    b.ToTable("User_Watcheds");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>

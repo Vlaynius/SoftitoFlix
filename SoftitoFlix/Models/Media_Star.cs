@@ -10,6 +10,5 @@ namespace SoftitoFlix.Models
 		public Media? Media { get; set; }
         [ForeignKey("StarId")]
         public Star? Star { get; set; }
-
     }
 }

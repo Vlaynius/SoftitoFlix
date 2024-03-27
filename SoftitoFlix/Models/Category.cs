@@ -9,6 +9,5 @@ namespace SoftitoFlix.Models
         [Column(TypeName = "nvarchar(50)")]
 		[StringLength(50,MinimumLength = 2)]
         public required string Name { get; set; }
-
     }
 }
