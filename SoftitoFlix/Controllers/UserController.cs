@@ -21,35 +21,6 @@ namespace SoftitoFlix.Controllers
             _signInManager = signInManager;
         }
 
-        //LogIn
-        [HttpPost]
-        public ActionResult LogIn(string userName, string Password)
-        {
-
-            ApplicationUser? user = _signInManager.UserManager.FindByNameAsync(userName).Result;
-            if (user == null)
-            {
-                return BadRequest(); //Kullanıcı 
-            }
-            try
-            {
-                Microsoft.AspNetCore.Identity.SignInResult signInResult = _signInManager.PasswordSignInAsync(user, Password, false, false).Result;
-                bool sonuc = signInResult.Succeeded;
-                if (sonuc != true )
-                {
-                    return Problem("Invalid UserName or Password");
-                }
-                user.Passive = false;
-                _signInManager.UserManager.UpdateAsync(user).Wait();
-            }
-            catch (Exception)
-            {
-                return Problem();
-            }
-
-            return Ok("Successfull");
-        }
-
         // GET: api/User
         [HttpGet]
         [Authorize(Roles = "Administrator")]
@@ -228,5 +199,33 @@ namespace SoftitoFlix.Controllers
             return Ok("Password Reset Successfull");
         }
 
+        //LogIn
+        [HttpPost("LogIn")]
+        public ActionResult LogIn(string userName, string Password)
+        {
+
+            ApplicationUser? user = _signInManager.UserManager.FindByNameAsync(userName).Result;
+            if (user == null)
+            {
+                return BadRequest(); //Kullanıcı 
+            }
+            try
+            {
+                Microsoft.AspNetCore.Identity.SignInResult signInResult = _signInManager.PasswordSignInAsync(user, Password, false, false).Result;
+                bool sonuc = signInResult.Succeeded;
+                if (sonuc != true)
+                {
+                    return Problem("Invalid UserName or Password");
+                }
+                user.Passive = false;
+                _signInManager.UserManager.UpdateAsync(user).Wait();
+            }
+            catch (Exception)
+            {
+                return Problem();
+            }
+
+            return Ok("Successfull");
+        }
     }
 }
