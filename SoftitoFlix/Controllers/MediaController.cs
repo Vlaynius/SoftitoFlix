@@ -182,9 +182,9 @@ namespace SoftitoFlix.Controllers
         // DELETE: api/Media_Stars/5
         [HttpDelete("{id}")]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult DeleteMedia_Star(int mediaId, )
+        public ActionResult DeleteMedia_Star(int mediaId, int starId)
         {
-            var media_Star = await _context.Media_Stars.FindAsync(id);
+            Media_Star? media_Star = _context.Media_Stars.Where(mr => mr.MediaId == mediaId).FirstOrDefault(mr => mr.StarId == starId);
             if (media_Star == null)
             {
                 return NotFound();
@@ -194,9 +194,5 @@ namespace SoftitoFlix.Controllers
             return NoContent();
         }
 
-        private bool Media_StarExists(int id)
-        {
-            return (_context.Media_Stars?.Any(e => e.MediaId == id)).GetValueOrDefault();
-        }
     }
 }
