@@ -26,7 +26,7 @@ namespace SoftitoFlix.Controllers
             return _context.Media_Categories.ToList();
         }
 
-        [HttpGet()]
+        [HttpGet("Media_Categories")]
         [Authorize]//bu media'nın tüm category'leri
         public ActionResult<List<Media_Category>> GetMedia_Category(int mediaId)
         {
@@ -38,7 +38,7 @@ namespace SoftitoFlix.Controllers
             return media_Category;
         }
 
-        [HttpGet()]
+        [HttpGet("Category_Medias")]
         [Authorize]//bu category'nin medyaları
         public ActionResult<List<Media_Category>> GetCategory_Media(int categoryId)
         {
