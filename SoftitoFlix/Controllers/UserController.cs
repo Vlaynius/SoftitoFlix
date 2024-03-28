@@ -13,7 +13,12 @@ namespace SoftitoFlix.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        //private readonly ApplicationDbContext _context;
+        public struct LogInModel
+        {
+            public string userName { get; set; }
+            public string password { get; set; } 
+        }
+
         private readonly SignInManager<ApplicationUser> _signInManager;
 
         public UserController( SignInManager<ApplicationUser> signInManager)
@@ -199,19 +204,17 @@ namespace SoftitoFlix.Controllers
             return Ok("Password Reset Successfull");
         }
 
-        //LogIn
         [HttpPost("LogIn")]
-        public ActionResult LogIn(string userName, string Password)
+        public ActionResult LogIn(LogInModel logInModel)
         {
-
-            ApplicationUser? user = _signInManager.UserManager.FindByNameAsync(userName).Result;
+            ApplicationUser? user = _signInManager.UserManager.FindByNameAsync(logInModel.userName).Result;
             if (user == null)
             {
                 return BadRequest(); //Kullanıcı 
             }
             try
             {
-                Microsoft.AspNetCore.Identity.SignInResult signInResult = _signInManager.PasswordSignInAsync(user, Password, false, false).Result;
+                Microsoft.AspNetCore.Identity.SignInResult signInResult = _signInManager.PasswordSignInAsync(user, logInModel.password, false, false).Result;
                 bool sonuc = signInResult.Succeeded;
                 if (sonuc != true)
                 {
@@ -224,8 +227,8 @@ namespace SoftitoFlix.Controllers
             {
                 return Problem();
             }
-
             return Ok("Successfull");
         }
+
     }
 }
