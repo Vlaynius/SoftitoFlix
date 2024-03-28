@@ -44,7 +44,7 @@ namespace SoftitoFlix.Controllers
         }
 
         // GET: api/Media_Stars/5
-        [HttpGet("{id}")]
+        [HttpGet("{media_id}")]
         [Authorize]
         public ActionResult<List<Media_Star>> Media_Stars(int mediaId)
         {
@@ -69,7 +69,7 @@ namespace SoftitoFlix.Controllers
         }
 
         // GET: api/Media_Restrictions/5
-        [HttpGet("{id}")]
+        [HttpGet("{Media_Id}")]
         [Authorize]
         public ActionResult<List<Media_Restriction>> Media_Restrictions(int mediaId)
         {
@@ -83,7 +83,7 @@ namespace SoftitoFlix.Controllers
 
         // PUT: api/Media/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut]
         [Authorize("ContentAdmin")]
         public void PutMedia( Media media)
         {
@@ -111,7 +111,7 @@ namespace SoftitoFlix.Controllers
         // POST: api/Media
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize("ContentAdmin")]
+        //[Authorize("ContentAdmin")]
         public int PostMedia(Media media)
         {
             _context.Medias.Add(media);
@@ -119,8 +119,56 @@ namespace SoftitoFlix.Controllers
             return media.Id;
         }
 
+        [HttpPost("Media_Category")]
+        //[Authorize("ContentAdmin")]
+        public bool PostMedia_Category(int mediaId, int categoryId)
+        {
+            Media_Category media_Category = new Media_Category();
+            media_Category.CategoryId = categoryId;
+            media_Category.MediaId = mediaId;
+            _context.Media_Categories.Add(media_Category);
+            _context.SaveChanges();
+            return true;
+        }
+
+        [HttpPost("Media_Star")]
+        //[Authorize("ContentAdmin")]
+        public bool PostMedia_Star(int mediaId, int starId)
+        {
+            Media_Star media_Star = new Media_Star();
+            media_Star.MediaId = mediaId;
+            media_Star.StarId = starId;
+            _context.Media_Stars.Add(media_Star);
+            _context.SaveChanges();
+            return true;
+        }
+
+        [HttpPost("Media_Restriction")]
+        //[Authorize("ContentAdmin")]
+        public bool PostMedia_Restriction(int mediaId, byte restrictionId)
+        {
+            Media_Restriction media_Restriction = new Media_Restriction();
+            media_Restriction.MediaId = mediaId;
+            media_Restriction.RestrictionId = restrictionId;
+            _context.Media_Restrictions.Add(media_Restriction);
+            _context.SaveChanges();
+            return true;
+        }
+
+        [HttpPost("Media_Director")]
+        //[Authorize("ContentAdmin")]
+        public bool PostMedia_Director(int mediaId, int directorId)
+        {
+            Media_Director media_Director = new Media_Director();
+            media_Director.MediaId = mediaId;
+            media_Director.DirectorId = directorId;
+            _context.Media_Directors.Add(media_Director);
+            _context.SaveChanges();
+            return true;
+        }
+
         // DELETE: api/Media/5
-        [HttpDelete("{id}")]
+        [HttpDelete("Media")]
         [Authorize("ContentAdmin")]
         public ActionResult DeleteMedia(int id)
         {
@@ -136,7 +184,7 @@ namespace SoftitoFlix.Controllers
         }
 
         // DELETE: api/Media_Categories/5
-        [HttpDelete("{id}")]
+        [HttpDelete("Media_Category")]
         [Authorize(Roles = "ContentAdmin")]
         public ActionResult DeleteMedia_Category(int mediaId, int categoryId)
         {
@@ -151,7 +199,7 @@ namespace SoftitoFlix.Controllers
         }
 
         // DELETE: api/Media_Directors/5
-        [HttpDelete("{id}")]
+        [HttpDelete("Media_Director")]
         [Authorize(Roles = "ContentAdmin")]
         public ActionResult DeleteMedia_Director(int mediaId, int directorId)
         {
@@ -165,7 +213,7 @@ namespace SoftitoFlix.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("Media_Restriction")]
         [Authorize(Roles = "ContentAdmin")]
         public ActionResult DeleteMedia_Restriction(int mediaId, byte restrictionId)
         {
@@ -180,7 +228,7 @@ namespace SoftitoFlix.Controllers
         }
 
         // DELETE: api/Media_Stars/5
-        [HttpDelete("{id}")]
+        [HttpDelete("Media_Star")]
         [Authorize(Roles = "ContentAdmin")]
         public ActionResult DeleteMedia_Star(int mediaId, int starId)
         {

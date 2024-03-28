@@ -13,12 +13,7 @@ namespace SoftitoFlix.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        public struct LogInModel
-        {
-            public string userName { get; set; }
-            public string password { get; set; } 
-        }
-
+        
         private readonly SignInManager<ApplicationUser> _signInManager;
 
         public UserController( SignInManager<ApplicationUser> signInManager)
@@ -26,15 +21,25 @@ namespace SoftitoFlix.Controllers
             _signInManager = signInManager;
         }
 
+        public struct LogInModel
+        {
+            public string userName { get; set; }
+            public string password { get; set; }
+        }
+
         // GET: api/User
         [HttpGet]
         [Authorize(Roles = "Administrator")]
-        public  ActionResult<List<ApplicationUser>> GetUsers(bool IncludePassiveUsers = true)
+        public  ActionResult<List<ApplicationUser>> GetUsers(bool IncludePassiveUsers = true, bool IncludeDeletedUsers = true)
         {
             IQueryable<ApplicationUser> users = _signInManager.UserManager.Users;
             if (IncludePassiveUsers == false)
             {
                 users = users.Where(u=>u.Passive == false);
+            }
+            if(IncludeDeletedUsers == false)
+            {
+                users = users.Where(u => u.Deleted == false);
             }
             return users.AsNoTracking().ToList();
         }
@@ -208,7 +213,7 @@ namespace SoftitoFlix.Controllers
         public ActionResult LogIn(LogInModel logInModel)
         {
             ApplicationUser? user = _signInManager.UserManager.FindByNameAsync(logInModel.userName).Result;
-            if (user == null)
+            if (user == null || user.Deleted == true)
             {
                 return BadRequest(); 
             }
@@ -220,8 +225,7 @@ namespace SoftitoFlix.Controllers
                 {
                     return Problem("Invalid UserName or Password");
                 }
-                user.Passive = false;
-                _signInManager.UserManager.UpdateAsync(user).Wait();
+                
             }
             catch (Exception)
             {

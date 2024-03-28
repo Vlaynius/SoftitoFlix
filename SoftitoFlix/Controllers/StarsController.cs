@@ -42,7 +42,7 @@ namespace SoftitoFlix.Controllers
             return star;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{star_id}")]
         [Authorize]
         public ActionResult<List<Media_Star>> Stars_Media(int starId)
         {

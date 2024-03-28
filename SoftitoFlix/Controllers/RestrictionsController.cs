@@ -37,7 +37,7 @@ namespace SoftitoFlix.Controllers
             return restriction;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("restriction_id")]
         [Authorize]
         public ActionResult<List<Media_Restriction>> Restriction_Medias(byte restrictionId)
         {
@@ -69,6 +69,7 @@ namespace SoftitoFlix.Controllers
         // POST: api/Restrictions
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "ContentAdmin")]
         public byte PostRestriction(Restriction restriction)
         {
             _context.Restrictions.Add(restriction);
@@ -85,6 +86,7 @@ namespace SoftitoFlix.Controllers
 
         // DELETE: api/Restrictions/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
         public ActionResult DeleteRestriction(byte id)
         { 
             Restriction? restriction = _context.Restrictions.Find(id);

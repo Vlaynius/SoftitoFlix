@@ -36,7 +36,7 @@ namespace SoftitoFlix.Controllers
             return category;
         }
 
-        [HttpGet("Category_Medias")]
+        [HttpGet("{CategoryId}")]
         [Authorize]//bu category'nin medyaları
         public ActionResult<List<Media_Category>> Category_Medias(int categoryId)
         {
