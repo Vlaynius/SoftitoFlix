@@ -21,16 +21,46 @@ namespace SoftitoFlix.Controllers
             _signInManager = signInManager;
         }
 
+        //LogIn
+        [HttpPost]
+        public ActionResult LogIn(string userName, string Password)
+        {
+
+            ApplicationUser? user = _signInManager.UserManager.FindByNameAsync(userName).Result;
+            if (user == null)
+            {
+                return BadRequest(); //Kullanıcı 
+            }
+            try
+            {
+                Microsoft.AspNetCore.Identity.SignInResult signInResult = _signInManager.PasswordSignInAsync(user, Password, false, false).Result;
+                bool sonuc = signInResult.Succeeded;
+                if (sonuc != true )
+                {
+                    return Problem("Invalid UserName or Password");
+                }
+                user.Passive = false;
+                _signInManager.UserManager.UpdateAsync(user).Wait();
+            }
+            catch (Exception)
+            {
+                return Problem();
+            }
+
+            return Ok("Successfull");
+        }
+
         // GET: api/User
         [HttpGet]
         [Authorize(Roles = "Administrator")]
-        public  ActionResult<List<ApplicationUser>> GetUsers()
+        public  ActionResult<List<ApplicationUser>> GetUsers(bool IncludePassiveUsers = true)
         {
-            if (_signInManager.UserManager.Users == null)
+            IQueryable<ApplicationUser> users = _signInManager.UserManager.Users;
+            if (IncludePassiveUsers == false)
             {
-                return NotFound();
+                users = users.Where(u=>u.Passive == false);
             }
-            return  _signInManager.UserManager.Users.AsNoTracking().ToList();
+            return users.AsNoTracking().ToList();
         }
 
         // GET: api/User/5
@@ -63,6 +93,13 @@ namespace SoftitoFlix.Controllers
         [Authorize]
         public ActionResult PutApplicationUser( ApplicationUser applicationUser)
         {
+            if (User.IsInRole("CustomerRepresentative") == false)
+            {
+                if (User.FindFirstValue(ClaimTypes.NameIdentifier) == applicationUser.Id.ToString() == false)
+                {
+                    return Unauthorized();
+                }
+            }
             ApplicationUser? user = _signInManager.UserManager.Users.Where(u => u.Id == applicationUser.Id).FirstOrDefault();
             if (user == null)
             {
@@ -96,8 +133,16 @@ namespace SoftitoFlix.Controllers
 
         // DELETE: api/User/5
         [HttpDelete("{id}")]
+        [Authorize]
         public ActionResult PassifyApplicationUser(long id)
         {
+            if((User.IsInRole("Administrator" ) || User.IsInRole("CustomerRepresentative")) == false)
+            {
+                if (User.FindFirstValue(ClaimTypes.NameIdentifier) == id.ToString() == false)
+                {
+                    return Unauthorized();
+                }
+            }
             ApplicationUser? applicationUser = _signInManager.UserManager.FindByIdAsync(id.ToString()).Result;
             if (applicationUser == null)
             {

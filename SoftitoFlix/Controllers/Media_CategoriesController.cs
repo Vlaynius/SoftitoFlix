@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Data;
@@ -24,18 +20,29 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Media_Categories
         [HttpGet]
-        [Authorize("ContentAdmin")]
+        [Authorize(Roles = "ContentAdmin")]
         public ActionResult<List<Media_Category>> GetMedia_Categories()
         {
             return _context.Media_Categories.ToList();
         }
 
-        // GET: api/Media_Categories/5
-        [HttpGet("{id}")]
-        [Authorize]
-        public ActionResult<Media_Category> GetMedia_Category(int id)
+        [HttpGet()]
+        [Authorize]//bu media'nın tüm category'leri
+        public ActionResult<List<Media_Category>> GetMedia_Category(int mediaId)
         {
-            Media_Category? media_Category = _context.Media_Categories.Find(id);
+            List<Media_Category>? media_Category = _context.Media_Categories.Where(mc => mc.MediaId == mediaId).ToList();
+            if (media_Category == null)
+            {
+                return NotFound();
+            }
+            return media_Category;
+        }
+
+        [HttpGet()]
+        [Authorize]//bu category'nin medyaları
+        public ActionResult<List<Media_Category>> GetCategory_Media(int categoryId)
+        {
+            List<Media_Category>? media_Category = _context.Media_Categories.Where(mc => mc.CategoryId == categoryId).ToList();
             if (media_Category == null)
             {
                 return NotFound();
@@ -46,6 +53,7 @@ namespace SoftitoFlix.Controllers
         // PUT: api/Media_Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
         public void PutMedia_Category(Media_Category media_Category)
         {
             _context.Entry(media_Category).State = EntityState.Modified;
@@ -61,6 +69,7 @@ namespace SoftitoFlix.Controllers
         // POST: api/Media_Categories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "ContentAdmin")]
         public ActionResult<Media_Category> PostMedia_Category(Media_Category media_Category)
         {
             _context.Media_Categories.Add(media_Category);
@@ -70,28 +79,17 @@ namespace SoftitoFlix.Controllers
             }
             catch (Exception)
             {
-                if (Media_CategoryExists(media_Category.MediaId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                
             }
-
             return CreatedAtAction("GetMedia_Category", new { id = media_Category.MediaId }, media_Category);
         }
 
         // DELETE: api/Media_Categories/5
         [HttpDelete("{id}")]
-        public ActionResult DeleteMedia_Category(int id)
+        [Authorize(Roles = "ContentAdmin")]
+        public ActionResult DeleteMedia_Category(int mediaId, int categoryId)
         {
-            if (_context.Media_Categories == null)
-            {
-                return NotFound();
-            }
-            var media_Category =  _context.Media_Categories.Find(id);
+            Media_Category? media_Category = _context.Media_Categories.Where(mc => mc.MediaId == mediaId).FirstOrDefault(mc => mc.CategoryId == categoryId);
             if (media_Category == null)
             {
                 return NotFound();
@@ -99,11 +97,6 @@ namespace SoftitoFlix.Controllers
             _context.Media_Categories.Remove(media_Category);
             _context.SaveChanges();
             return NoContent();
-        }
-
-        private bool Media_CategoryExists(int id)
-        {
-            return (_context.Media_Categories?.Any(e => e.MediaId == id)).GetValueOrDefault();
         }
     }
 }
