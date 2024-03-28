@@ -43,6 +43,44 @@ namespace SoftitoFlix.Controllers
             return media;
         }
 
+        // GET: api/Media_Stars/5
+        [HttpGet("{id}")]
+        [Authorize]
+        public ActionResult<List<Media_Star>> Media_Stars(int mediaId)
+        {
+            List<Media_Star> media_Stars = _context.Media_Stars.Where(mr => mr.MediaId == mediaId).ToList();
+            if (media_Stars == null)
+            {
+                return NotFound();
+            }
+            return media_Stars;
+        }
+
+        [HttpGet("{Director_id}")]
+        [Authorize]
+        public ActionResult<List<Media_Director>> Media_Directors(int directorId)
+        {
+            List<Media_Director>? media_Director = _context.Media_Directors.Where(md => md.DirectorId == directorId).ToList();
+            if (media_Director == null)
+            {
+                return NotFound();
+            }
+            return media_Director;
+        }
+
+        // GET: api/Media_Restrictions/5
+        [HttpGet("{id}")]
+        [Authorize]
+        public ActionResult<List<Media_Restriction>> Media_Restrictions(int mediaId)
+        {
+            List<Media_Restriction> media_Restriction = _context.Media_Restrictions.Where(mr => mr.MediaId == mediaId).ToList();
+            if (media_Restriction == null)
+            {
+                return NotFound();
+            }
+            return media_Restriction;
+        }
+
         // PUT: api/Media/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -56,6 +94,18 @@ namespace SoftitoFlix.Controllers
             }
             catch (Exception)
             { }
+        }
+
+        [HttpGet("Media_Categories")]
+        [Authorize]
+        public ActionResult<List<Media_Category>> Media_Categories(int mediaId)
+        {
+            List<Media_Category>? media_Category = _context.Media_Categories.Where(mc => mc.MediaId == mediaId).ToList();
+            if (media_Category == null)
+            {
+                return NotFound();
+            }
+            return media_Category;
         }
 
         // POST: api/Media
@@ -85,5 +135,68 @@ namespace SoftitoFlix.Controllers
             return NoContent();
         }
 
+        // DELETE: api/Media_Categories/5
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
+        public ActionResult DeleteMedia_Category(int mediaId, int categoryId)
+        {
+            Media_Category? media_Category = _context.Media_Categories.Where(mc => mc.MediaId == mediaId).FirstOrDefault(mc => mc.CategoryId == categoryId);
+            if (media_Category == null)
+            {
+                return NotFound();
+            }
+            _context.Media_Categories.Remove(media_Category);
+            _context.SaveChanges();
+            return NoContent();
+        }
+
+        // DELETE: api/Media_Directors/5
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
+        public ActionResult DeleteMedia_Director(int mediaId, int directorId)
+        {
+            Media_Director? media_Director = _context.Media_Directors.Where(md => md.MediaId == mediaId).FirstOrDefault(md => md.DirectorId == directorId);
+            if (media_Director == null)
+            {
+                return NotFound();
+            }
+            _context.Media_Directors.Remove(media_Director);
+            _context.SaveChanges();
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
+        public ActionResult DeleteMedia_Restriction(int mediaId, byte restrictionId)
+        {
+            Media_Restriction? media_Restriction = _context.Media_Restrictions.Where(mr => mr.MediaId == mediaId).FirstOrDefault(mr => mr.RestrictionId == restrictionId);
+            if (media_Restriction == null)
+            {
+                return NotFound();
+            }
+            _context.Media_Restrictions.Remove(media_Restriction);
+            _context.SaveChanges();
+            return NoContent();
+        }
+
+        // DELETE: api/Media_Stars/5
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
+        public ActionResult DeleteMedia_Star(int mediaId, )
+        {
+            var media_Star = await _context.Media_Stars.FindAsync(id);
+            if (media_Star == null)
+            {
+                return NotFound();
+            }
+            _context.Media_Stars.Remove(media_Star);
+            _context.SaveChanges();
+            return NoContent();
+        }
+
+        private bool Media_StarExists(int id)
+        {
+            return (_context.Media_Stars?.Any(e => e.MediaId == id)).GetValueOrDefault();
+        }
     }
 }

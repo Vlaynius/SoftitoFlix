@@ -42,6 +42,18 @@ namespace SoftitoFlix.Controllers
             return star;
         }
 
+        [HttpGet("{id}")]
+        [Authorize]
+        public ActionResult<List<Media_Star>> Stars_Media(int starId)
+        {
+            List<Media_Star> Stars_Media = _context.Media_Stars.Where(mr => mr.StarId == starId).ToList();
+            if (Stars_Media == null)
+            {
+                return NotFound();
+            }
+            return Stars_Media;
+        }
+
         // PUT: api/Stars/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -69,6 +81,21 @@ namespace SoftitoFlix.Controllers
             _context.SaveChanges();
 
             return star.Id;
+        }
+
+        // DELETE: api/Media_Stars/5
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
+        public ActionResult DeleteMedia_Star(int mediaId, int starId)
+        {
+            Media_Star? media_Star =  _context.Media_Stars.Where(ms=>ms.MediaId == mediaId).FirstOrDefault(ms=>ms.StarId == starId);
+            if (media_Star == null)
+            {
+                return NotFound();
+            }
+            _context.Media_Stars.Remove(media_Star);
+            _context.SaveChanges();
+            return NoContent();
         }
 
     }

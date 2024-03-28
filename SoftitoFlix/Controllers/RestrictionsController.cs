@@ -37,6 +37,18 @@ namespace SoftitoFlix.Controllers
             return restriction;
         }
 
+        [HttpGet("{id}")]
+        [Authorize]
+        public ActionResult<List<Media_Restriction>> Restriction_Medias(byte restrictionId)
+        {
+            List<Media_Restriction> media_Restriction = _context.Media_Restrictions.Where(mr => mr.RestrictionId == restrictionId).ToList();
+            if (media_Restriction == null)
+            {
+                return NotFound();
+            }
+            return media_Restriction;
+        }
+
         // PUT: api/Restrictions/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]

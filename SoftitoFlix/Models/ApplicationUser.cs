@@ -14,6 +14,7 @@ namespace SoftitoFlix.Models
         [NotMapped]
         [StringLength(100,MinimumLength = 8)]
         public required string Password { get; set; }
-        public bool Passive { get; set; } 
+        public bool Passive { get; set; }
+        public bool Deleted { get; set; }
     }
 }

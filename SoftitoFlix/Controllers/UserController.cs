@@ -110,7 +110,7 @@ namespace SoftitoFlix.Controllers
         // DELETE: api/User/5
         [HttpDelete("{id}")]
         [Authorize]
-        public ActionResult PassifyApplicationUser(long id)
+        public ActionResult DeleteApplicationUser(long id)
         {
             if((User.IsInRole("Administrator" ) || User.IsInRole("CustomerRepresentative")) == false)
             {
@@ -124,7 +124,7 @@ namespace SoftitoFlix.Controllers
             {
                 return NotFound();
             }
-            applicationUser.Passive = true;
+            applicationUser.Deleted = true;
             _signInManager.UserManager.UpdateAsync(applicationUser).Wait();
             return NoContent();
         }
@@ -149,7 +149,7 @@ namespace SoftitoFlix.Controllers
             ApplicationUser? applicationUser = _signInManager.UserManager.FindByNameAsync(userName).Result;
             if (applicationUser == null)
             {
-                return Problem();//Kullanıcı Yok
+                return Problem();
             }
             try
             {
@@ -170,7 +170,7 @@ namespace SoftitoFlix.Controllers
             ApplicationUser? applicationUser = _signInManager.UserManager.FindByNameAsync(userName).Result;
             if (applicationUser == null)
             {
-                return false;//Kullanıcı Yok
+                return false;
             }
 
             var changePasswordResult = await _signInManager.UserManager.ChangePasswordAsync(applicationUser, currentPassword, NewPassword);
@@ -183,7 +183,7 @@ namespace SoftitoFlix.Controllers
             ApplicationUser? applicationUser = _signInManager.UserManager.FindByNameAsync(userName).Result;
             if (applicationUser == null)
             {
-                return null;//Kullanıcı Yok
+                return null;
             }
             return _signInManager.UserManager.GeneratePasswordResetTokenAsync(applicationUser).Result;
         }
@@ -194,7 +194,7 @@ namespace SoftitoFlix.Controllers
             ApplicationUser? applicationUser = _signInManager.UserManager.FindByNameAsync(UserName).Result;
             if (applicationUser == null)
             {
-                return NotFound();//Kullanıcı Yok
+                return NotFound();
             }
             IdentityResult identityResult = _signInManager.UserManager.ResetPasswordAsync(applicationUser, token, newPassword).Result;
             if (!identityResult.Succeeded)
@@ -210,7 +210,7 @@ namespace SoftitoFlix.Controllers
             ApplicationUser? user = _signInManager.UserManager.FindByNameAsync(logInModel.userName).Result;
             if (user == null)
             {
-                return BadRequest(); //Kullanıcı 
+                return BadRequest(); 
             }
             try
             {

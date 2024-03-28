@@ -25,7 +25,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Directors
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "ContentAdmin")]
         public ActionResult<List<Director>> GetDirectors()
         {
             return  _context.Directors.ToList();
@@ -42,6 +42,19 @@ namespace SoftitoFlix.Controllers
                 return NotFound();
             }
             return director;
+        }
+
+
+        [HttpGet("{Media_id}")]
+        [Authorize]
+        public ActionResult<List<Media_Director>> Directors_Medias(int mediaId)
+        {
+            List<Media_Director>? media_Director = _context.Media_Directors.Where(md => md.MediaId == mediaId).ToList();
+            if (media_Director == null)
+            {
+                return NotFound();
+            }
+            return media_Director;
         }
 
         // PUT: api/Directors/5

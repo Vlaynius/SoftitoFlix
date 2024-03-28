@@ -36,6 +36,18 @@ namespace SoftitoFlix.Controllers
             return category;
         }
 
+        [HttpGet("Category_Medias")]
+        [Authorize]//bu category'nin medyaları
+        public ActionResult<List<Media_Category>> Category_Medias(int categoryId)
+        {
+            List<Media_Category>? media_Category = _context.Media_Categories.Where(mc => mc.CategoryId == categoryId).ToList();
+            if (media_Category == null)
+            {
+                return NotFound();
+            }
+            return media_Category;
+        }
+
         // PUT: api/Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
