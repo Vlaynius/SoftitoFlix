@@ -17,7 +17,7 @@ namespace SoftitoFlix.Models
         [Column(TypeName = "varchar(20)")]
         [StringLength(20, MinimumLength = 2)]
         public required string Resolution { get; set; }
-
-	}
+        public bool Passive { get; set; }
+    }
 }
 

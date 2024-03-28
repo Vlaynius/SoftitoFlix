@@ -12,6 +12,7 @@ namespace SoftitoFlix.Models
         [StringLength(100, MinimumLength = 2)]
 		[Required]
         public required string Name { get; set; }
+		public bool Passive { get; set; }
     }
 }
 

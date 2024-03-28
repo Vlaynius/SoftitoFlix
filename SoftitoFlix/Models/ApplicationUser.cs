@@ -11,6 +11,9 @@ namespace SoftitoFlix.Models
         [Column(TypeName = "nvarchar(100)")]
         [StringLength(100, MinimumLength = 2)]
         public required string Name { get; set; }
+        [NotMapped]
+        [StringLength(100,MinimumLength = 8)]
+        public required string Password { get; set; }
         public bool Passive { get; set; } 
     }
 }
