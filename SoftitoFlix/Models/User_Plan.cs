@@ -9,10 +9,6 @@ namespace SoftitoFlix.Models
         public long UserId { get; set; }
         public short PlanId { get; set; }
 
-        [Column(TypeName = "nvarchar(50)")]
-        [StringLength(50, MinimumLength = 2)]
-        public required string Name { get; set; }
-
         [Column(TypeName = "date")]
         public DateTime StartDate { get; set; }
         [Column(TypeName = "date")]

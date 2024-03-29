@@ -16,3 +16,9 @@ namespace SoftitoFlix.Models
     }
 }
 
+/*
+ id = 0 --> 7+
+ id = 1 --> 13+
+ id = 2 --> 18+
+ 
+ */
