@@ -47,18 +47,6 @@ namespace SoftitoFlix.Controllers
             return episode;
         }
 
-        private byte restrictionCheck(DateTime BirthDate, int mediaId)
-        {
-            List<Media_Restriction>? media_restrictions = _context.Media_Restrictions.Where(mr => mr.MediaId == mediaId).ToList();
-            DateTime Adult = BirthDate.AddYears(18);
-            if (Adult > BirthDate)
-            {   //yetişkin değil restrictionları kontrol et
-
-
-
-            }
-        }
-
         [HttpGet("Watch")]
         [Authorize]
         public ActionResult Watch(long id)
