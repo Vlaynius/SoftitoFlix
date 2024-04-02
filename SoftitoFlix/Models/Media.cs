@@ -9,17 +9,18 @@ namespace SoftitoFlix.Models
 		public int Id { get; set; }
         [Column(TypeName = "nvarchar(100)")]
         [StringLength(100, MinimumLength = 2)]
-        public required string Name { get; set; }
+        public string Name { get; set; } = "";
         [Column(TypeName = "nvarchar(450)")]
         [StringLength(450)]
-        public required string Description { get; set; }
+        public string? Description { get; set; }
         public List<Media_Category>? Media_Categories { get; set; }
         public List<Media_Director>? Media_Directors { get; set; }
         public List<Media_Star>? Media_Stars { get; set; }
         public List<Media_Restriction>? Media_Restrictions { get; set; }
-        [Range(0,10)]
-        public float Rating { get; set; }
+        [Range(1800,short.MaxValue)]
+        public short ReleaseDate { get; set; }
         public bool Passive { get; set; }
-        public float? IMDBrating { get; set; }
+        [Range(0, 10)]
+        public float? IMDB_Rating { get; set; }
     }
 }

@@ -76,6 +76,11 @@ public class Program
                 restriction.Id = 20;
                 restriction.Passive = false;
                 context.Restrictions.Add(restriction);
+                restriction = new Restriction();
+                restriction.Name = "Cinsellik";
+                restriction.Id = 21;
+                restriction.Passive = false;
+                context.Restrictions.Add(restriction);
 
             }
 
