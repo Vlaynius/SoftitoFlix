@@ -27,10 +27,14 @@
     <None Remove="Models\" />
     <None Remove="Data\" />
     <None Remove="Controllers\" />
+    <None Remove="Models\CrossTables\" />
+    <None Remove="Models\Identity\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
     <Folder Include="Data\" />
     <Folder Include="Controllers\" />
+    <Folder Include="Models\CrossTables\" />
+    <Folder Include="Models\Identity\" />
   </ItemGroup>
 </Project>
