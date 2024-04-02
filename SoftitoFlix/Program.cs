@@ -12,7 +12,8 @@ public class Program
     {
         Restriction restriction;
         ApplicationUser applicationUser;
-        IdentityRole identityRole;
+        ApplicationRole identityRole;
+        Category category;
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
@@ -21,8 +22,8 @@ public class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
               options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDatabase")));
-        builder.Services.AddDefaultIdentity<ApplicationUser>()
-                    .AddEntityFrameworkStores<ApplicationDbContext>();//AddDefaultTokenProviders()
+        builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
+                    .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
@@ -43,7 +44,7 @@ public class Program
         if (context != null)
         {
             context.Database.Migrate();
-            if(context.Restrictions.Count() == 0 )
+            if(!context.Restrictions.Any())
             {
                 restriction = new Restriction();
                 restriction.Name = "Genel Izleyici";
@@ -51,8 +52,8 @@ public class Program
                 restriction.Passive = false;
                 context.Restrictions.Add(restriction);
                 restriction = new Restriction();
-                restriction.Name = "18";
-                restriction.Id = 18;
+                restriction.Name = "7";
+                restriction.Id = 7;
                 restriction.Passive = false;
                 context.Restrictions.Add(restriction);
                 restriction = new Restriction();
@@ -61,8 +62,8 @@ public class Program
                 restriction.Passive = false;
                 context.Restrictions.Add(restriction);
                 restriction = new Restriction();
-                restriction.Name = "7";
-                restriction.Id = 7;
+                restriction.Name = "18";
+                restriction.Id = 18;
                 restriction.Passive = false;
                 context.Restrictions.Add(restriction);
                 restriction = new Restriction();
@@ -76,28 +77,55 @@ public class Program
                 restriction.Passive = false;
                 context.Restrictions.Add(restriction);
 
-
             }
+
+            if (!context.Categories.Any())
+            {
+                category = new Category();
+                category.Name = "Bilim-Kurgu";
+                context.Categories.Add(category);
+                category = new Category();
+                category.Name = "Aksiyon";
+                context.Categories.Add(category);
+                category = new Category();
+                category.Name = "Gerilim";
+                context.Categories.Add(category);
+                category = new Category();
+                category.Name = "Korku";
+                context.Categories.Add(category);
+                category = new Category();
+                category.Name = "Komedi";
+                context.Categories.Add(category);
+                category = new Category();
+                category.Name = "Romantik";
+                context.Categories.Add(category);
+                category = new Category();
+                category.Name = "Animasyon";
+                context.Categories.Add(category);
+                category = new Category();
+                category.Name = "Fantastik";
+                context.Categories.Add(category);
+            }
+
             context.SaveChanges();
-            RoleManager<IdentityRole>? roleManager = app.Services.CreateScope().ServiceProvider.GetService<RoleManager<IdentityRole>>();
+            RoleManager<ApplicationRole>? roleManager = app.Services.CreateScope().ServiceProvider.GetService<RoleManager<ApplicationRole>>();
             if (roleManager != null)
             {
-                if (roleManager.Roles.Count() == 0)
+                if (!roleManager.Roles.Any())
                 {
-                    identityRole = new IdentityRole("Administrator");
+                    identityRole = new ApplicationRole("Administrator");
                     roleManager.CreateAsync(identityRole).Wait();
-                    identityRole = new IdentityRole("ContentAdmin");
+                    identityRole = new ApplicationRole("ContentAdmin ");
                     roleManager.CreateAsync(identityRole).Wait();
-                    identityRole = new IdentityRole("CustomerRepresentative");
+                    identityRole = new ApplicationRole("CustomerRepresentative");
                     roleManager.CreateAsync(identityRole).Wait();
                 }
             }
 
-
             UserManager<ApplicationUser>? userManager = app.Services.CreateScope().ServiceProvider.GetService<UserManager<ApplicationUser>>();
             if (userManager != null)
             {
-                if (userManager.Users.Count() == 0)
+                if (!userManager.Users.Any())
                 {
                     applicationUser = new ApplicationUser();
                     applicationUser.UserName = "Administrator";
@@ -109,10 +137,36 @@ public class Program
                     applicationUser.Deleted = false;
                     userManager.CreateAsync(applicationUser, "Admin123!").Wait();
                     userManager.AddToRoleAsync(applicationUser, "Administrator").Wait();
+
+                    applicationUser = new ApplicationUser();
+                    applicationUser.UserName = "ContentAdmin";
+                    applicationUser.Name = "ContentAdmin";
+                    applicationUser.Email = "abc@def.com";
+                    applicationUser.PhoneNumber = "1112223344";
+                    applicationUser.BirthDate = DateTime.Today;
+                    applicationUser.Passive = false;
+                    applicationUser.Deleted = false;
+                    userManager.CreateAsync(applicationUser, "Admin123!").Wait();
+                    userManager.AddToRoleAsync(applicationUser, "ContentAdmin").Wait();
+
+                    applicationUser = new ApplicationUser();
+                    applicationUser.UserName = "CustomerRepresentative";
+                    applicationUser.Name = "CustomerRepresentative";
+                    applicationUser.Email = "abc@def.com";
+                    applicationUser.PhoneNumber = "1112223344";
+                    applicationUser.BirthDate = DateTime.Today;
+                    applicationUser.Passive = false;
+                    applicationUser.Deleted = false;
+                    userManager.CreateAsync(applicationUser, "Admin123!").Wait();
+                    userManager.AddToRoleAsync(applicationUser, "CustomerRepresentative").Wait();
                 }
+
             }
 
         }
-            app.Run();
+
+
+
+        app.Run();
     }
 }

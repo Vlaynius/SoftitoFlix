@@ -59,26 +59,13 @@ namespace SoftitoFlix.Controllers
             return user_Plan;
         }
 
-        // PUT: api/User_Plans/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public void PutUser_Plan(User_Plan user_Plan)
-        {
-            _context.Entry(user_Plan).State = EntityState.Modified;
-            try
-            {
-                _context.SaveChanges();
-            }
-            catch (Exception){ }
-        }
-
         // POST: api/User_Plans
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public void PostUser_Plan(string eMail, short planId)
         {
             Plan plan = _context.Plans.Find(planId)!;
-            //Get Payment fpr plan.price
+            //Get Payment for plan.price
             //if(payment succesfull)
             {
                 User_Plan user_Plan = new User_Plan();

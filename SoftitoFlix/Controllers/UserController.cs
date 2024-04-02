@@ -17,7 +17,6 @@ namespace SoftitoFlix.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ApplicationDbContext _context;
 
-
         public UserController( SignInManager<ApplicationUser> signInManager, ApplicationDbContext context)
         {
             _signInManager = signInManager;
@@ -28,6 +27,12 @@ namespace SoftitoFlix.Controllers
         {
             public string userName { get; set; }
             public string password { get; set; }
+        }
+
+        private struct movie
+        {
+            public Media media { get; set; }
+            public int ViewCount { get; set; }
         }
 
         // GET: api/User
@@ -216,43 +221,44 @@ namespace SoftitoFlix.Controllers
             return Ok("Password Reset Successfull");
         }
 
-        private struct movie
-        {
-            public Media media { get; set; }
-            public int ViewCount { get; set; }
-        }
-
         [HttpPost("LogIn")]
         public ActionResult<List<Media>> LogIn(LogInModel logInModel)
         {
-            bool sonuc = false;
+            int i;
             IQueryable<User_Favorite> user_Favorites;
             IGrouping<int, Media_Category>? media_Categories;
             IQueryable<Media> mediasQuery;
             IQueryable<int> user_Watched;
+            List<Media> medias = new List<Media>();
+            List<movie> movies = new List<movie>();
             ApplicationUser? user = _signInManager.UserManager
                 .FindByNameAsync(logInModel.userName).Result;
+
+
             if (user == null || user.Deleted == true)
             {
                 return BadRequest(); 
             }
-            try
+           
+            if (_context.User_Plans.Where(u => u.UserId == user.Id && u.EndDate >= DateTime.Today).Any() == false)
             {
-                Microsoft.AspNetCore.Identity.SignInResult signInResult =
+                user.Passive = true;
+                _signInManager.UserManager.UpdateAsync(user).Wait();
+            }
+            if (user.Passive == true)
+            {
+                return Content("Passive");
+            }
+            Microsoft.AspNetCore.Identity.SignInResult signInResult =
                     _signInManager.PasswordSignInAsync(user, logInModel.password, false, false).Result;
-                sonuc = signInResult.Succeeded;
-            }
-            catch (Exception)
-            {
-                return Problem();
-            }
-            if (sonuc != true)
+           
+            if (signInResult.Succeeded == false)
             {
                 return Problem("Invalid UserName or Password");
             }
+           
             user_Favorites = _context.User_Favorites.Where(u => u.UserId == user.Id)
                 .Include(u => u.Media).ThenInclude(u => u!.Media_Categories);
-
             media_Categories = user_Favorites.ToList().SelectMany(u => u.Media!.Media_Categories!)
                 .GroupBy(m => m.CategoryId).OrderByDescending(m => m.Count()).FirstOrDefault();            
             if(media_Categories != null)
@@ -260,35 +266,42 @@ namespace SoftitoFlix.Controllers
                 int fav_category = media_Categories.Key;
                 user_Watched = _context.User_Watcheds.Where(u => u.UserId == user.Id).Include(u => u.Episode)
                     .Select(u=>u.Episode!.MediaId).Distinct();
-                mediasQuery = _context.Medias.Include(m => m.Media_Categories!
-                    .Where(mc => mc.CategoryId == fav_category))
-                    .Where(w => user_Watched.Contains(w.Id) == false);
-                if(user.Restriction != null)
+                mediasQuery = _context.Medias.Include(m => m.Media_Categories!.Where(mc => mc.CategoryId == fav_category))
+                    .Where(m => m.Media_Categories!.Count() > 0).Where(w => user_Watched.Contains(w.Id) == false);
+                if (user.Restriction != null)
                 {
-                    mediasQuery = mediasQuery.Include(m => m.Media_Restrictions.Where(r => r.RestrictionId <= user.Restriction));
+                    mediasQuery = mediasQuery.Include(m => m.Media_Restrictions!.Where(r => r.RestrictionId <= user.Restriction));
                 }
-                List<movie> movies = new List<movie>();
-                foreach(Media media in mediasQuery)
-                {
-                    movie movie = new movie();
-                    int count = _context.User_Watcheds.Include(m=>m.Episode.Media).Where(m=>m.Episode.MediaId == media.Id).Count();
-                    movie.ViewCount = count;
-                    movie.media = media;
-                    movies.Add(movie);
-                }
-                movies = movies.OrderByDescending(m => m.ViewCount).AsQueryable().ToList();
-                List<Media> medias = new List<Media>();
-                for (int i = 0; i < 5; i++)
-                {
-                    medias.Add(movies[i].media);
-                }
-
-                return medias;
+            }
+            else
+            {   //Favoriler boşsa yeni bir kullanıcıysa
+                mediasQuery = _context.Medias.Include(m => m.Media_Restrictions!.Where(r => r.RestrictionId <= user.Restriction));
+            }
+            
+            foreach (Media media in mediasQuery)
+            {
+                movie movie = new movie();
+                int count = _context.User_Watcheds.Include(m => m.Episode!.Media).Where(m => m.Episode!.MediaId == media.Id).Count();
+                movie.ViewCount = count;
+                movie.media = media;
+                movies.Add(movie);
+            }
+            movies = movies.OrderByDescending(m => m.ViewCount).AsQueryable().ToList();
+            for (i = 0; i < 5 && i< movies.Count(); i++)
+            {
+                medias.Add(movies[i].media);
             }
 
-            return Problem();
-            
+            return medias;
         }
+
+        [HttpPost("Logout")]
+        [Authorize]
+        public void LogOut()
+        {
+            _signInManager.SignOutAsync().Wait();
+        }
+
 
     }
 }

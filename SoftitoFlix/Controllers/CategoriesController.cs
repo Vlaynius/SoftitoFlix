@@ -18,6 +18,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Categories
         [HttpGet]
+        //[Authorize]
         public ActionResult<List<Category>> GetCategories()
         {
             return  _context.Categories.ToList();
@@ -25,7 +26,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Categories/5
         [HttpGet("{id}")]
-        [Authorize]
+        //[Authorize]
         public  ActionResult<Category> GetCategory(int id)
         {
             Category? category =  _context.Categories.Find(id);
