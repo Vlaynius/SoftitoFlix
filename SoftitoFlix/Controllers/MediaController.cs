@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Data;
@@ -20,6 +15,13 @@ namespace SoftitoFlix.Controllers
         public MediaController(ApplicationDbContext context)
         {
             _context = context;
+        }
+
+        public struct media
+        {
+            public string name { get; set; }
+            public string? Description { get; set; }
+            public short ReleaseDate { get; set; }
         }
 
         // GET: api/Media
@@ -46,9 +48,9 @@ namespace SoftitoFlix.Controllers
         // GET: api/Media_Stars/5
         [HttpGet("{media_id}")]
         [Authorize]
-        public ActionResult<List<Media_Star>> Media_Stars(int mediaId)
+        public ActionResult<List<Media_Star>> Media_Stars(int media_id)
         {
-            List<Media_Star> media_Stars = _context.Media_Stars.Where(mr => mr.MediaId == mediaId).ToList();
+            List<Media_Star> media_Stars = _context.Media_Stars.Where(mr => mr.MediaId == media_id).ToList();
             if (media_Stars == null)
             {
                 return NotFound();
@@ -58,9 +60,9 @@ namespace SoftitoFlix.Controllers
 
         [HttpGet("{Director_id}")]
         [Authorize]
-        public ActionResult<List<Media_Director>> Media_Directors(int directorId)
+        public ActionResult<List<Media_Director>> Media_Directors(int Director_id)
         {
-            List<Media_Director>? media_Director = _context.Media_Directors.Where(md => md.DirectorId == directorId).ToList();
+            List<Media_Director>? media_Director = _context.Media_Directors.Where(md => md.DirectorId == Director_id).ToList();
             if (media_Director == null)
             {
                 return NotFound();
@@ -71,9 +73,9 @@ namespace SoftitoFlix.Controllers
         // GET: api/Media_Restrictions/5
         [HttpGet("{Media_Id}")]
         [Authorize]
-        public ActionResult<List<Media_Restriction>> Media_Restrictions(int mediaId)
+        public ActionResult<List<Media_Restriction>> Media_Restrictions(int Media_Id)
         {
-            List<Media_Restriction> media_Restriction = _context.Media_Restrictions.Where(mr => mr.MediaId == mediaId).ToList();
+            List<Media_Restriction> media_Restriction = _context.Media_Restrictions.Where(mr => mr.MediaId == Media_Id).ToList();
             if (media_Restriction == null)
             {
                 return NotFound();
@@ -83,10 +85,18 @@ namespace SoftitoFlix.Controllers
 
         // PUT: api/Media/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut]
+        [HttpPut("{id}")]
         [Authorize("ContentAdmin")]
-        public void PutMedia( Media media)
+        public ActionResult PutMedia( int id, media media_struct)
         {
+            Media? media = _context.Medias.Find(id);
+            if(media == null)
+            {
+                return NotFound();
+            }
+            media.Name = media_struct.name;
+            media.Description = media_struct.Description;
+            media.ReleaseDate = media_struct.ReleaseDate;
             _context.Entry(media).State = EntityState.Modified;
             try
             {
@@ -94,6 +104,7 @@ namespace SoftitoFlix.Controllers
             }
             catch (Exception)
             { }
+            return Ok();
         }
 
         [HttpGet("Media_Categories")]
@@ -168,11 +179,11 @@ namespace SoftitoFlix.Controllers
         }
 
         // DELETE: api/Media/5
-        [HttpDelete("Media")]
+        [HttpDelete("Media_id")]
         [Authorize("ContentAdmin")]
-        public ActionResult DeleteMedia(int id)
+        public ActionResult DeleteMedia(int Media_id)
         {
-            Media? media = _context.Medias.Find(id);
+            Media? media = _context.Medias.Find(Media_id);
             if (media == null)
             {
                 return NotFound();

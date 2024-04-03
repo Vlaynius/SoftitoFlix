@@ -13,14 +13,16 @@ namespace SoftitoFlix.Models
         [Column(TypeName = "nvarchar(450)")]
         [StringLength(450)]
         public string? Description { get; set; }
-        public List<Media_Category>? Media_Categories { get; set; }
-        public List<Media_Director>? Media_Directors { get; set; }
-        public List<Media_Star>? Media_Stars { get; set; }
-        public List<Media_Restriction>? Media_Restrictions { get; set; }
+        public virtual List<Media_Category>? Media_Categories { get; set; }
+        public virtual List<Media_Director>? Media_Directors { get; set; }
+        public virtual List<Media_Star>? Media_Stars { get; set; }
+        public virtual List<Media_Restriction>? Media_Restrictions { get; set; }
         [Range(1800,short.MaxValue)]
         public short ReleaseDate { get; set; }
         public bool Passive { get; set; }
         [Range(0, 10)]
-        public float? IMDB_Rating { get; set; }
+        public float? Rating { get; set; }
+        [Range(0,long.MaxValue)]
+        public long RatedBy { get; set; }
     }
 }

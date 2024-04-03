@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Data;
-using SoftitoFlix.Dtos;
 using SoftitoFlix.Models;
 using System.Security.Claims;
 
@@ -41,6 +40,16 @@ namespace SoftitoFlix.Controllers
             public string UserName { get; set; }
             public string CurrentPassword { get; set; }
             public string NewPassword { get; set; }
+        }
+
+        public struct UserStruct
+        {
+            public string userName { get; set; }
+            public string email { get; set; } 
+            public string phoneNumber { get; set; } 
+            public DateTime BirthDate { get; set; }
+            public string name { get; set; } 
+            public string password { get; set; }
         }
 
         // GET: api/User
@@ -88,7 +97,7 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize]
-        public ActionResult PutApplicationUser(long id, ApplicationUser_Dto Dto)
+        public ActionResult PutApplicationUser(long id, UserStruct userStruct)
         {
             if (User.IsInRole("CustomerRepresentative") == false)
             {
@@ -102,11 +111,11 @@ namespace SoftitoFlix.Controllers
             {
                 return NotFound();
             }
-            user.Name = Dto.name;
-            user.BirthDate = Dto.BirthDate;
-            user.Email = Dto.email;
-            user.PhoneNumber = Dto.phoneNumber;
-            user.UserName = Dto.userName;
+            user.Name = userStruct.name;
+            user.BirthDate = userStruct.BirthDate;
+            user.Email = userStruct.email;
+            user.PhoneNumber = userStruct.phoneNumber;
+            user.UserName = userStruct.userName;
             _signInManager.UserManager.UpdateAsync(user).Wait();
             return Ok();
         }
@@ -114,21 +123,21 @@ namespace SoftitoFlix.Controllers
         // POST: api/User
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public ActionResult<object> PostApplicationUser(ApplicationUser_Dto Dto)
+        public ActionResult<object> PostApplicationUser(UserStruct userStruct)
         {
             if(User.Identity.IsAuthenticated == true)
             {
                 return BadRequest();
             }
             ApplicationUser applicationUser = new ApplicationUser();
-            applicationUser.UserName = Dto.userName;
-            applicationUser.PhoneNumber = Dto.phoneNumber;
-            applicationUser.Email = Dto.email;
-            applicationUser.BirthDate = Dto.BirthDate;
+            applicationUser.UserName = userStruct.userName;
+            applicationUser.PhoneNumber = userStruct.phoneNumber;
+            applicationUser.Email = userStruct.email;
+            applicationUser.BirthDate = userStruct.BirthDate;
             applicationUser.Passive = false;
             applicationUser.Deleted = false;
 
-            IdentityResult IdentityResult =_signInManager.UserManager.CreateAsync(applicationUser,Dto.password).Result;
+            IdentityResult IdentityResult =_signInManager.UserManager.CreateAsync(applicationUser, userStruct.password).Result;
             if(IdentityResult != IdentityResult.Success)
             {
                 return IdentityResult.Errors.FirstOrDefault()!.Description;
@@ -319,6 +328,12 @@ namespace SoftitoFlix.Controllers
             _signInManager.SignOutAsync().Wait();
         }
 
+        [HttpPost()]
+        [Authorize]
+        public void AddFovorite()
+        {
+            1
+        }
 
     }
 }

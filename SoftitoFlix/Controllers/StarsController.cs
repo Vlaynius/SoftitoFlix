@@ -22,6 +22,18 @@ namespace SoftitoFlix.Controllers
             _context = context;
         }
 
+        public struct star
+        {
+            public int id { get; set; }
+            public string name { get; set; }
+        }
+
+        public struct media_star
+        {
+            public int mediaId { get; set; }
+            public int starId { get; set; }
+        }
+
         // GET: api/Stars
         [HttpGet]
         [Authorize]
@@ -44,9 +56,9 @@ namespace SoftitoFlix.Controllers
 
         [HttpGet("{star_id}")]
         [Authorize]
-        public ActionResult<List<Media_Star>> Stars_Media(int starId)
+        public ActionResult<List<Media_Star>> Stars_Media(int star_id)
         {
-            List<Media_Star> Stars_Media = _context.Media_Stars.Where(mr => mr.StarId == starId).ToList();
+            List<Media_Star> Stars_Media = _context.Media_Stars.Where(mr => mr.StarId == star_id).ToList();
             if (Stars_Media == null)
             {
                 return NotFound();
@@ -58,8 +70,14 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize("ContentAdmin")]
-        public void PutStar( Star star)
+        public ActionResult PutStar( star struct_star)
         {
+            Star? star = _context.Stars.Find(struct_star.id);
+            if(star == null)
+            {
+                return NotFound();
+            }
+            star.Name = struct_star.name;
             _context.Entry(star).State = EntityState.Modified;
             try
             {
@@ -68,15 +86,18 @@ namespace SoftitoFlix.Controllers
             catch (Exception)
             {
                 
-            }           
+            }
+            return Ok();
         }
 
         // POST: api/Stars
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize("ContentAdmin")]
-        public int PostStar(Star star)
+        public int PostStar(string name)
         {
+            Star star = new Star();
+            star.Name = name;
             _context.Stars.Add(star);
             _context.SaveChanges();
 
@@ -86,9 +107,9 @@ namespace SoftitoFlix.Controllers
         // DELETE: api/Media_Stars/5
         [HttpDelete("{id}")]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult DeleteMedia_Star(int mediaId, int starId)
+        public ActionResult DeleteMedia_Star(media_star mediaStar)
         {
-            Media_Star? media_Star =  _context.Media_Stars.Where(ms=>ms.MediaId == mediaId).FirstOrDefault(ms=>ms.StarId == starId);
+            Media_Star? media_Star =  _context.Media_Stars.Where(ms=>ms.MediaId == mediaStar.mediaId).FirstOrDefault(ms=>ms.StarId == mediaStar.starId);
             if (media_Star == null)
             {
                 return NotFound();

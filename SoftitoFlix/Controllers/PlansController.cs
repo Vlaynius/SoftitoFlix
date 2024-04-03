@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using System.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Data;
@@ -19,6 +16,13 @@ namespace SoftitoFlix.Controllers
         public PlansController(ApplicationDbContext context)
         {
             _context = context;
+        }
+
+        public struct plan
+        {
+            public string name { get; set; }
+            public float price { get; set; }
+            public string resolution { get; set; }
         }
 
         // GET: api/Plans
@@ -44,8 +48,17 @@ namespace SoftitoFlix.Controllers
         // PUT: api/Plans/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public void PutPlan( Plan plan)
+        [Authorize(Roles = "ContentAdmin")]
+        public ActionResult PutPlan(short id, plan plan_struct)
         {
+            Plan? plan = _context.Plans.Find(id);
+            if(plan == null)
+            {
+                return NotFound();
+            }
+            plan.Name = plan_struct.name;
+            plan.Price = plan_struct.price;
+            plan.Resolution = plan_struct.resolution;
             _context.Entry(plan).State = EntityState.Modified;
 
             try
@@ -56,13 +69,20 @@ namespace SoftitoFlix.Controllers
             {
                 
             }
+            return Ok();
         }
 
         // POST: api/Plans
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public short PostPlan(Plan plan)
+        [Authorize(Roles = "ContentAdmin")]
+        public short PostPlan(plan plan_struct)
         {
+            Plan plan = new Plan();
+            plan.Name = plan_struct.name;
+            plan.Price = plan_struct.price;
+            plan.Resolution = plan_struct.resolution;
+            plan.Passive = false;
             _context.Plans.Add(plan);
             _context.SaveChanges();
             return plan.Id;
@@ -70,6 +90,7 @@ namespace SoftitoFlix.Controllers
 
         // DELETE: api/Plans/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
         public ActionResult DeletePlan(short id)
         {
             Plan? plan = _context.Plans.Find(id);
@@ -83,5 +104,26 @@ namespace SoftitoFlix.Controllers
             return NoContent();
         }
 
+        [HttpPut("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
+        public ActionResult ChangeActivationStatus(short id)
+        {
+            Plan? plan = _context.Plans.Find(id);
+            if (plan == null)
+            {
+                return NotFound();
+            }
+            if (plan.Passive == true)
+            {
+                plan.Passive = false;
+            }
+            else
+            {
+                plan.Passive = true;
+            }
+
+
+            return Ok();
+        }
     }
 }

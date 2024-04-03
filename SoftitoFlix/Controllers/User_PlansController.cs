@@ -21,6 +21,12 @@ namespace SoftitoFlix.Controllers
             _signInManager = signInManager;
         }
 
+        public struct plan_puchase
+        {
+            public string eMail { get; set; }
+            public short planId { get; set; }
+        }
+
         // GET: api/User_Plans
         [HttpGet("All")]
         [Authorize("Administrator")]
@@ -49,9 +55,9 @@ namespace SoftitoFlix.Controllers
 
         [HttpGet("{id}")]
         [Authorize(Roles = "Administrator")]
-        public ActionResult<List<User_Plan>> User_Plans(long userid)
+        public ActionResult<List<User_Plan>> User_Plans(long id)
         {
-            List<User_Plan> user_Plan = _context.User_Plans.Where(p => p.UserId == userid).ToList();
+            List<User_Plan> user_Plan = _context.User_Plans.Where(p => p.UserId == id).ToList();
             if (user_Plan == null)
             {
                 return NotFound();
@@ -62,17 +68,17 @@ namespace SoftitoFlix.Controllers
         // POST: api/User_Plans
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public void PostUser_Plan(string eMail, short planId)
+        public void PostUser_Plan(plan_puchase plan_Puchase)
         {
-            Plan plan = _context.Plans.Find(planId)!;
+            Plan plan = _context.Plans.Find(plan_Puchase.planId)!;
             //Get Payment for plan.price
             //if(payment succesfull)
             {
                 User_Plan user_Plan = new User_Plan();
-                ApplicationUser applicationUser = _signInManager.UserManager.FindByEmailAsync(eMail).Result!;
+                ApplicationUser applicationUser = _signInManager.UserManager.FindByEmailAsync(plan_Puchase.eMail).Result!;
 
                 user_Plan.UserId = applicationUser.Id;
-                user_Plan.PlanId = planId;
+                user_Plan.PlanId = plan_Puchase.planId;
                 _context.User_Plans.Add(user_Plan);
                 _context.SaveChanges();
             }

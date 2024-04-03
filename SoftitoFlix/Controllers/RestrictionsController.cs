@@ -17,6 +17,12 @@ namespace SoftitoFlix.Controllers
             _context = context;
         }
 
+        public struct restriction
+        {
+            public byte id { get; set; }
+            public string name { get; set; }
+        }
+
         // GET: api/Restrictions
         [HttpGet]
         public ActionResult<List<Restriction>> GetRestrictions()
@@ -51,10 +57,18 @@ namespace SoftitoFlix.Controllers
 
         // PUT: api/Restrictions/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut()]
         [Authorize("ContentAdmin")]
-        public void PutRestriction( Restriction restriction)
+        public ActionResult PutRestriction( restriction restriction_struct)
         {
+            Restriction? restriction = _context.Restrictions.Find(restriction_struct.id);
+            if(restriction == null)
+            {
+                return NotFound();
+            }
+
+            restriction.Name = restriction_struct.name;
+
             _context.Entry(restriction).State = EntityState.Modified;
             try
             {
@@ -64,14 +78,18 @@ namespace SoftitoFlix.Controllers
             {
                 
             }
+            return Ok();
         }
 
         // POST: api/Restrictions
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "ContentAdmin")]
-        public byte PostRestriction(Restriction restriction)
+        public byte PostRestriction(string name)
         {
+            Restriction restriction = new Restriction();
+            restriction.Name = name;
+            restriction.Passive = false;
             _context.Restrictions.Add(restriction);
             try
             {
@@ -100,6 +118,28 @@ namespace SoftitoFlix.Controllers
 
             return NoContent();
         }
-        
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "ContentAdmin")]
+        public ActionResult ChangeActivationStatus( byte id)
+        {
+            Restriction? restriction = _context.Restrictions.Find(id);
+            if(restriction == null)
+            {
+                return NotFound();
+            }
+            if(restriction.Passive == true)
+            {
+                restriction.Passive = false;
+            }
+            else
+            {
+                restriction.Passive = true;
+            }
+
+
+            return Ok();
+        }
+
     }
 }
