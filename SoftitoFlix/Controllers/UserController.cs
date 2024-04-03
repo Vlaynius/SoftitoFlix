@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Data;
+using SoftitoFlix.Dtos;
 using SoftitoFlix.Models;
 using System.Security.Claims;
 
@@ -29,10 +30,17 @@ namespace SoftitoFlix.Controllers
             public string password { get; set; }
         }
 
-        private struct movie
+        public struct movie
         {
             public Media media { get; set; }
             public int ViewCount { get; set; }
+        }
+
+        public struct changePassword
+        {
+            public string UserName { get; set; }
+            public string CurrentPassword { get; set; }
+            public string NewPassword { get; set; }
         }
 
         // GET: api/User
@@ -80,25 +88,25 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize]
-        public ActionResult PutApplicationUser( ApplicationUser applicationUser)
+        public ActionResult PutApplicationUser(long id, ApplicationUser_Dto Dto)
         {
             if (User.IsInRole("CustomerRepresentative") == false)
             {
-                if (User.FindFirstValue(ClaimTypes.NameIdentifier) == applicationUser.Id.ToString() == false)
+                if (User.FindFirstValue(ClaimTypes.NameIdentifier) == id.ToString() == false)
                 {
                     return Unauthorized();
                 }
             }
-            ApplicationUser? user = _signInManager.UserManager.Users.Where(u => u.Id == applicationUser.Id).FirstOrDefault();
+            ApplicationUser? user = _signInManager.UserManager.Users.Where(u => u.Id == id).FirstOrDefault();
             if (user == null)
             {
                 return NotFound();
             }
-            user.Name = applicationUser.Name;
-            user.BirthDate = applicationUser.BirthDate;
-            user.Email = applicationUser.Email;
-            user.PhoneNumber = applicationUser.PhoneNumber;
-            user.UserName = applicationUser.UserName;
+            user.Name = Dto.name;
+            user.BirthDate = Dto.BirthDate;
+            user.Email = Dto.email;
+            user.PhoneNumber = Dto.phoneNumber;
+            user.UserName = Dto.userName;
             _signInManager.UserManager.UpdateAsync(user).Wait();
             return Ok();
         }
@@ -106,13 +114,21 @@ namespace SoftitoFlix.Controllers
         // POST: api/User
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public ActionResult<object> PostApplicationUser(ApplicationUser applicationUser)
+        public ActionResult<object> PostApplicationUser(ApplicationUser_Dto Dto)
         {
             if(User.Identity.IsAuthenticated == true)
             {
                 return BadRequest();
             }
-            IdentityResult IdentityResult =_signInManager.UserManager.CreateAsync(applicationUser,applicationUser.Password).Result;
+            ApplicationUser applicationUser = new ApplicationUser();
+            applicationUser.UserName = Dto.userName;
+            applicationUser.PhoneNumber = Dto.phoneNumber;
+            applicationUser.Email = Dto.email;
+            applicationUser.BirthDate = Dto.BirthDate;
+            applicationUser.Passive = false;
+            applicationUser.Deleted = false;
+
+            IdentityResult IdentityResult =_signInManager.UserManager.CreateAsync(applicationUser,Dto.password).Result;
             if(IdentityResult != IdentityResult.Success)
             {
                 return IdentityResult.Errors.FirstOrDefault()!.Description;
@@ -157,9 +173,9 @@ namespace SoftitoFlix.Controllers
 
         [Authorize(Roles = "Administrator")]
         [HttpPost("SetPassword")]
-        public ActionResult<string> SetPassword(string userName, string NewPassword)
+        public ActionResult<string> SetPassword(LogInModel logInModel)
         {
-            ApplicationUser? applicationUser = _signInManager.UserManager.FindByNameAsync(userName).Result;
+            ApplicationUser? applicationUser = _signInManager.UserManager.FindByNameAsync(logInModel.userName).Result;
             if (applicationUser == null)
             {
                 return Problem();
@@ -167,7 +183,7 @@ namespace SoftitoFlix.Controllers
             try
             {
                 _signInManager.UserManager.RemovePasswordAsync(applicationUser).Wait();
-                _signInManager.UserManager.AddPasswordAsync(applicationUser, NewPassword).Wait();
+                _signInManager.UserManager.AddPasswordAsync(applicationUser, logInModel.password).Wait();
             }
             catch (Exception)
             {
@@ -176,19 +192,20 @@ namespace SoftitoFlix.Controllers
             return Ok("Password Assigned Successfully");
         }
 
+        
         [Authorize]
         [HttpPost("ChangePassword")]
-        public async Task<bool> ChangePassword(string userName, string currentPassword, string NewPassword)
+        public bool ChangePassword(changePassword change)
         {
             ApplicationUser? applicationUser = _signInManager.UserManager
-                .FindByNameAsync(userName).Result;
+                .FindByNameAsync(change.UserName).Result;
             if (applicationUser == null)
             {
                 return false;
             }
 
-            var changePasswordResult = await _signInManager.UserManager
-                .ChangePasswordAsync(applicationUser, currentPassword, NewPassword);
+            IdentityResult changePasswordResult = _signInManager.UserManager
+                .ChangePasswordAsync(applicationUser, change.CurrentPassword, change.NewPassword).Result;
             return changePasswordResult.Succeeded;
         }
 
@@ -204,16 +221,16 @@ namespace SoftitoFlix.Controllers
         }
 
         [HttpPost("ValidateResetPassword")]
-        public ActionResult<string> ValidateResetPassword(string UserName, string token, string newPassword)
+        public ActionResult<string> ValidateResetPassword(LogInModel logInModel, string token)
         {
             ApplicationUser? applicationUser = _signInManager.UserManager
-                .FindByNameAsync(UserName).Result;
+                .FindByNameAsync(logInModel.userName).Result;
             if (applicationUser == null)
             {
                 return NotFound();
             }
             IdentityResult identityResult = _signInManager.UserManager
-                .ResetPasswordAsync(applicationUser, token, newPassword).Result;
+                .ResetPasswordAsync(applicationUser, token, logInModel.password).Result;
             if (!identityResult.Succeeded)
             {
                 return identityResult.Errors.First().Description;

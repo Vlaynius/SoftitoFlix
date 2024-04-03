@@ -29,6 +29,8 @@
     <None Remove="Controllers\" />
     <None Remove="Models\CrossTables\" />
     <None Remove="Models\Identity\" />
+    <None Remove="Dto%27s\" />
+    <None Remove="Models\Entity\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
@@ -36,5 +38,7 @@
     <Folder Include="Controllers\" />
     <Folder Include="Models\CrossTables\" />
     <Folder Include="Models\Identity\" />
+    <Folder Include="Dto%27s\" />
+    <Folder Include="Models\Entity\" />
   </ItemGroup>
 </Project>
