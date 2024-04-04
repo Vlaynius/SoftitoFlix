@@ -75,7 +75,7 @@ namespace SoftitoFlix.Controllers
         // POST: api/Plans
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize(Roles = "ContentAdmin")]
+        //[Authorize(Roles = "ContentAdmin")]
         public short PostPlan(Plan_struct plan_struct)
         {
             Plan plan = new Plan();

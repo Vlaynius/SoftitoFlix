@@ -125,7 +125,7 @@ namespace SoftitoFlix.Controllers
         [HttpPost]
         public ActionResult<object> PostApplicationUser(UserStruct userStruct)
         {
-            if(User.Identity.IsAuthenticated == true)
+            if(User.Identity!.IsAuthenticated == true)
             {
                 return BadRequest();
             }
@@ -204,7 +204,7 @@ namespace SoftitoFlix.Controllers
         
         [Authorize]
         [HttpPost("ChangePassword")]
-        public bool ChangePassword(ChangePassword change)
+        public bool ChangethePassword(ChangePassword change)
         {
             ApplicationUser? applicationUser = _signInManager.UserManager
                 .FindByNameAsync(change.UserName).Result;
