@@ -74,10 +74,11 @@ namespace SoftitoFlix.Controllers
 
         // POST: api/Plans
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        //[Authorize(Roles = "ContentAdmin")]
+        [HttpPost("Plan")]
+        [Authorize(Roles = "ContentAdmin")]
         public short PostPlan(Plan_struct plan_struct)
         {
+
             Plan plan = new Plan();
             plan.Name = plan_struct.name;
             plan.Price = plan_struct.price;

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Models;
@@ -36,5 +36,6 @@ namespace SoftitoFlix.Data
             modelBuilder.Entity<User_Favorite>().HasKey(uf => new { uf.MediaId, uf.UserId });
 
         }
+
     }
 }
