@@ -2,7 +2,6 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Data;
 using SoftitoFlix.Models;
 
@@ -68,23 +67,34 @@ namespace SoftitoFlix.Controllers
         // POST: api/User_Plans
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public void PostUser_Plan(plan_puchase plan_Puchase)
+        public ActionResult PostUser_Plan(plan_puchase plan_Puchase)
         {
             Plan plan = _context.Plans.Find(plan_Puchase.planId)!;
+            ApplicationUser applicationUser = _signInManager.UserManager.FindByEmailAsync(plan_Puchase.eMail).Result!;
+            List<User_Plan> plans = _context.User_Plans.Where(p => p.UserId == applicationUser.Id).ToList();
+            foreach(User_Plan Pl in plans)
+            {
+                if(Pl.EndDate < DateTime.Today)
+                {
+                    return Ok("Devam eden bir aboneliğiniz var.");
+                }
+            }
             //Get Payment for plan.price
             //if(payment succesfull)
             {
                 User_Plan user_Plan = new User_Plan();
-                ApplicationUser applicationUser = _signInManager.UserManager.FindByEmailAsync(plan_Puchase.eMail).Result!;
-
                 user_Plan.UserId = applicationUser.Id;
                 user_Plan.PlanId = plan_Puchase.planId;
                 user_Plan.StartDate = DateTime.Today;
                 user_Plan.EndDate = user_Plan.StartDate.AddMonths(1);
                 _context.User_Plans.Add(user_Plan);
+                applicationUser.Passive = false;
+                _signInManager.UserManager.UpdateAsync(applicationUser).Wait();
                 _context.SaveChanges();
             }
+            return Ok("Satın Alım Başarılı.");
         }
+
 
     }
 }

@@ -247,6 +247,7 @@ namespace SoftitoFlix.Controllers
             return Ok("Password Reset Successfull");
         }
 
+
         [HttpPost("LogIn")]
         public ActionResult<List<Media>> LogIn(LogInModel logInModel)
         {
@@ -259,13 +260,25 @@ namespace SoftitoFlix.Controllers
             List<movie> movies = new List<movie>();
             ApplicationUser? user = _signInManager.UserManager
                 .FindByNameAsync(logInModel.userName).Result;
+            Microsoft.AspNetCore.Identity.SignInResult signInResult;
 
 
             if (user == null || user.Deleted == true)
             {
                 return BadRequest(); 
             }
-           
+
+            if (_signInManager.UserManager.IsInRoleAsync(user, "Administrator").Result == true ||
+                _signInManager.UserManager.IsInRoleAsync(user, "ContentAdmin").Result == true ||
+                _signInManager.UserManager.IsInRoleAsync(user, "CustomerRepresentative").Result == true)
+            {
+               signInResult = _signInManager.PasswordSignInAsync(user, logInModel.password, false, false).Result;
+                if (signInResult.Succeeded)
+                {
+                    return Ok("Admin LoggedIn");
+                }
+            }
+
             if (_context.User_Plans.Where(u => u.UserId == user.Id && u.EndDate >= DateTime.Today).Any() == false)
             {
                 user.Passive = true;
@@ -275,8 +288,7 @@ namespace SoftitoFlix.Controllers
             {
                 return Content("Passive");
             }
-            Microsoft.AspNetCore.Identity.SignInResult signInResult =
-                    _signInManager.PasswordSignInAsync(user, logInModel.password, false, false).Result;
+            signInResult = _signInManager.PasswordSignInAsync(user, logInModel.password, false, false).Result;
            
             if (signInResult.Succeeded == false)
             {
