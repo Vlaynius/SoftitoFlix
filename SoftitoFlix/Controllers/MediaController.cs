@@ -17,7 +17,7 @@ namespace SoftitoFlix.Controllers
             _context = context;
         }
 
-        public struct media
+        public struct Media_struct
         {
             public string name { get; set; }
             public string? Description { get; set; }
@@ -87,7 +87,7 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize("ContentAdmin")]
-        public ActionResult PutMedia( int id, media media_struct)
+        public ActionResult PutMedia( int id, Media_struct media_struct)
         {
             Media? media = _context.Medias.Find(id);
             if(media == null)
@@ -123,7 +123,7 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize("ContentAdmin")]
-        public int PostMedia(media media_struct)
+        public int PostMedia(Media_struct media_struct)
         {
             Media media = new Media();
             media.Description = media_struct.Description;

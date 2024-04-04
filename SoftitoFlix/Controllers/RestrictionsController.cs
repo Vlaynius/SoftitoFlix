@@ -17,7 +17,7 @@ namespace SoftitoFlix.Controllers
             _context = context;
         }
 
-        public struct restriction
+        public struct Restriction_struct
         {
             public byte id { get; set; }
             public string name { get; set; }
@@ -59,7 +59,7 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut()]
         [Authorize("ContentAdmin")]
-        public ActionResult PutRestriction( restriction restriction_struct)
+        public ActionResult PutRestriction(Restriction_struct restriction_struct)
         {
             Restriction? restriction = _context.Restrictions.Find(restriction_struct.id);
             if(restriction == null)

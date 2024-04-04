@@ -28,7 +28,7 @@ namespace SoftitoFlix.Controllers
             _signInManager = signInManager;
         }
 
-        public struct episode
+        public struct Episode_struct
         {
             public int MediaId { get; set; }
             public byte SeasonNumber { get; set; }
@@ -92,7 +92,7 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult PutEpisode(episode episode_struct)
+        public ActionResult PutEpisode(Episode_struct episode_struct)
         {
             Episode? episode = _context.Episodes.Where(e => e.MediaId == episode_struct.MediaId).Where(e => e.SeasonNumber == episode_struct.SeasonNumber)
                 .Where(e => e.EpisodeNumber == episode_struct.EpisodeNumber).FirstOrDefault();
@@ -114,7 +114,7 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "ContentAdmin")]
-        public long PostEpisode(episode episode_struct)
+        public long PostEpisode(Episode_struct episode_struct)
         {
             Episode episode = new Episode();
             episode.Description = episode_struct.Description;

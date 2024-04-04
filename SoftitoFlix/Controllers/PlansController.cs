@@ -18,7 +18,7 @@ namespace SoftitoFlix.Controllers
             _context = context;
         }
 
-        public struct plan
+        public struct Plan_struct
         {
             public string name { get; set; }
             public float price { get; set; }
@@ -49,7 +49,7 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult PutPlan(short id, plan plan_struct)
+        public ActionResult PutPlan(short id, Plan_struct plan_struct)
         {
             Plan? plan = _context.Plans.Find(id);
             if(plan == null)
@@ -76,7 +76,7 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "ContentAdmin")]
-        public short PostPlan(plan plan_struct)
+        public short PostPlan(Plan_struct plan_struct)
         {
             Plan plan = new Plan();
             plan.Name = plan_struct.name;

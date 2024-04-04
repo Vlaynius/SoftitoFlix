@@ -20,7 +20,7 @@ namespace SoftitoFlix.Controllers
             _signInManager = signInManager;
         }
 
-        public struct plan_puchase
+        public struct Plan_puchase
         {
             public string eMail { get; set; }
             public short planId { get; set; }
@@ -67,7 +67,7 @@ namespace SoftitoFlix.Controllers
         // POST: api/User_Plans
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public ActionResult PostUser_Plan(plan_puchase plan_Puchase)
+        public ActionResult PostUser_Plan(Plan_puchase plan_Puchase)
         {
             Plan plan = _context.Plans.Find(plan_Puchase.planId)!;
             ApplicationUser applicationUser = _signInManager.UserManager.FindByEmailAsync(plan_Puchase.eMail).Result!;

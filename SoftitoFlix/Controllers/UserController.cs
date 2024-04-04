@@ -29,13 +29,13 @@ namespace SoftitoFlix.Controllers
             public string password { get; set; }
         }
 
-        public struct movie
+        public struct Movie
         {
             public Media media { get; set; }
             public int ViewCount { get; set; }
         }
 
-        public struct changePassword
+        public struct ChangePassword
         {
             public string UserName { get; set; }
             public string CurrentPassword { get; set; }
@@ -204,7 +204,7 @@ namespace SoftitoFlix.Controllers
         
         [Authorize]
         [HttpPost("ChangePassword")]
-        public bool ChangePassword(changePassword change)
+        public bool ChangePassword(ChangePassword change)
         {
             ApplicationUser? applicationUser = _signInManager.UserManager
                 .FindByNameAsync(change.UserName).Result;
@@ -257,7 +257,7 @@ namespace SoftitoFlix.Controllers
             IQueryable<Media> mediasQuery;
             IQueryable<int> user_Watched;
             List<Media> medias = new List<Media>();
-            List<movie> movies = new List<movie>();
+            List<Movie> movies = new List<Movie>();
             ApplicationUser? user = _signInManager.UserManager
                 .FindByNameAsync(logInModel.userName).Result;
             Microsoft.AspNetCore.Identity.SignInResult signInResult;
@@ -318,7 +318,7 @@ namespace SoftitoFlix.Controllers
             
             foreach (Media media in mediasQuery)
             {
-                movie movie = new movie();
+                Movie movie = new Movie();
                 int count = _context.User_Watcheds.Include(m => m.Episode!.Media).Where(m => m.Episode!.MediaId == media.Id).Count();
                 movie.ViewCount = count;
                 movie.media = media;

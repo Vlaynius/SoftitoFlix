@@ -22,13 +22,13 @@ namespace SoftitoFlix.Controllers
             _context = context;
         }
 
-        public struct star
+        public struct Star_struct
         {
             public int id { get; set; }
             public string name { get; set; }
         }
 
-        public struct media_star
+        public struct Media_star
         {
             public int mediaId { get; set; }
             public int starId { get; set; }
@@ -70,7 +70,7 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize("ContentAdmin")]
-        public ActionResult PutStar( star struct_star)
+        public ActionResult PutStar(Star_struct struct_star)
         {
             Star? star = _context.Stars.Find(struct_star.id);
             if(star == null)
@@ -107,7 +107,7 @@ namespace SoftitoFlix.Controllers
         // DELETE: api/Media_Stars/5
         [HttpDelete("{id}")]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult DeleteMedia_Star(media_star mediaStar)
+        public ActionResult DeleteMedia_Star(Media_star mediaStar)
         {
             Media_Star? media_Star =  _context.Media_Stars.Where(ms=>ms.MediaId == mediaStar.mediaId).FirstOrDefault(ms=>ms.StarId == mediaStar.starId);
             if (media_Star == null)
