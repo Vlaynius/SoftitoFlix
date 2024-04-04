@@ -21,7 +21,7 @@ namespace SoftitoFlix.Models
         public short ReleaseDate { get; set; }
         public bool Passive { get; set; }
         [Range(0, 10)]
-        public float? Rating { get; set; }
+        public float Rating { get; set; }
         [Range(0,long.MaxValue)]
         public long RatedBy { get; set; }
     }

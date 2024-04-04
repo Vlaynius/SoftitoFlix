@@ -15,7 +15,7 @@ namespace SoftitoFlix.Models
 		public DateTime ReleaseDate { get; set; }
         [Column(TypeName = "nvarchar(100)")]
         [StringLength(100, MinimumLength = 2)]
-        public required string Title { get; set; }
+        public string Title { get; set; } = "";
         [Column(TypeName = "nvarchar(450)")]
         [StringLength(450)]
         public string? Description { get; set; }

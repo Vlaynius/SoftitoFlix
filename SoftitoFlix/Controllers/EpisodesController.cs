@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NuGet.Protocol.Plugins;
 using SoftitoFlix.Data;
 using SoftitoFlix.Models;
@@ -23,6 +26,17 @@ namespace SoftitoFlix.Controllers
         {
             _context = context;
             _signInManager = signInManager;
+        }
+
+        public struct episode
+        {
+            public int MediaId { get; set; }
+            public byte SeasonNumber { get; set; }
+            public short EpisodeNumber { get; set; }
+            public DateTime ReleaseDate { get; set; }
+            public string Title { get; set; }
+            public string Description { get; set; }
+            public TimeSpan Duration { get; set; }
         }
 
         // GET: api/Episodes
@@ -76,10 +90,16 @@ namespace SoftitoFlix.Controllers
 
         // PUT: api/Episodes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut]
         [Authorize(Roles = "ContentAdmin")]
-        public void PutEpisode(Episode episode)
+        public ActionResult PutEpisode(episode episode_struct)
         {
+            Episode? episode = _context.Episodes.Where(e => e.MediaId == episode_struct.MediaId).Where(e => e.SeasonNumber == episode_struct.SeasonNumber)
+                .Where(e => e.EpisodeNumber == episode_struct.EpisodeNumber).FirstOrDefault();
+            if(episode == null)
+            {
+                return NotFound();
+            }
             _context.Entry(episode).State = EntityState.Modified;
             try
             {
@@ -87,14 +107,25 @@ namespace SoftitoFlix.Controllers
             }
             catch (Exception)
             { }
+            return Ok();
         }
 
         // POST: api/Episodes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "ContentAdmin")]
-        public long PostEpisode(Episode episode)
+        public long PostEpisode(episode episode_struct)
         {
+            Episode episode = new Episode();
+            episode.Description = episode_struct.Description;
+            episode.Duration = episode_struct.Duration;
+            episode.EpisodeNumber = episode_struct.EpisodeNumber;
+            episode.MediaId = episode_struct.MediaId;
+            episode.Passive = false;
+            episode.ReleaseDate = episode_struct.ReleaseDate;
+            episode.SeasonNumber = episode_struct.SeasonNumber;
+            episode.Title = episode_struct.Title;
+            episode.ViewCount = 0;
             _context.Episodes.Add(episode);
              _context.SaveChanges();
             return episode.Id;

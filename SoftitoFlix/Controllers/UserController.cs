@@ -328,12 +328,6 @@ namespace SoftitoFlix.Controllers
             _signInManager.SignOutAsync().Wait();
         }
 
-        [HttpPost()]
-        [Authorize]
-        public void AddFovorite()
-        {
-            1
-        }
 
     }
 }

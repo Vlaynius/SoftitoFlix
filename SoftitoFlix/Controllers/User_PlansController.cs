@@ -79,6 +79,8 @@ namespace SoftitoFlix.Controllers
 
                 user_Plan.UserId = applicationUser.Id;
                 user_Plan.PlanId = plan_Puchase.planId;
+                user_Plan.StartDate = DateTime.Today;
+                user_Plan.EndDate = user_Plan.StartDate.AddMonths(1);
                 _context.User_Plans.Add(user_Plan);
                 _context.SaveChanges();
             }

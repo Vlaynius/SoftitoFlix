@@ -104,7 +104,7 @@ namespace SoftitoFlix.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("Passive")]
         [Authorize(Roles = "ContentAdmin")]
         public ActionResult ChangeActivationStatus(short id)
         {

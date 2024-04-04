@@ -97,7 +97,7 @@ namespace SoftitoFlix.Controllers
             media.Name = media_struct.name;
             media.Description = media_struct.Description;
             media.ReleaseDate = media_struct.ReleaseDate;
-            _context.Entry(media).State = EntityState.Modified;
+            _context.Medias.Update(media);
             try
             {
                 _context.SaveChanges();
@@ -122,16 +122,23 @@ namespace SoftitoFlix.Controllers
         // POST: api/Media
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        //[Authorize("ContentAdmin")]
-        public int PostMedia(Media media)
+        [Authorize("ContentAdmin")]
+        public int PostMedia(media media_struct)
         {
+            Media media = new Media();
+            media.Description = media_struct.Description;
+            media.Name = media_struct.name;
+            media.Passive = false;
+            media.RatedBy = 0;
+            media.Rating = 0;
+            media.ReleaseDate = media_struct.ReleaseDate;
             _context.Medias.Add(media);
             _context.SaveChanges();
             return media.Id;
         }
 
         [HttpPost("Media_Category")]
-        //[Authorize("ContentAdmin")]
+        [Authorize("ContentAdmin")]
         public bool PostMedia_Category(int mediaId, int categoryId)
         {
             Media_Category media_Category = new Media_Category();
@@ -143,7 +150,7 @@ namespace SoftitoFlix.Controllers
         }
 
         [HttpPost("Media_Star")]
-        //[Authorize("ContentAdmin")]
+        [Authorize("ContentAdmin")]
         public bool PostMedia_Star(int mediaId, int starId)
         {
             Media_Star media_Star = new Media_Star();
@@ -251,6 +258,30 @@ namespace SoftitoFlix.Controllers
             _context.Media_Stars.Remove(media_Star);
             _context.SaveChanges();
             return NoContent();
+        }
+
+        [HttpPut("Rate")]
+        [Authorize]
+        public ActionResult RateMedia(int media_id, byte Rating)// [0,10]
+        {
+            Media? media = _context.Medias.Find(media_id);
+            if(media == null)
+            {
+                return NotFound();
+            }
+            float totalPoint = media.RatedBy * media.Rating;
+            totalPoint += Rating;
+            media.RatedBy++;
+            media.Rating = totalPoint / media.RatedBy;
+
+            _context.Medias.Update(media);
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch (Exception)
+            { }
+            return Ok();
         }
 
     }

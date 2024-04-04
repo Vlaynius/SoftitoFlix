@@ -78,7 +78,7 @@ namespace SoftitoFlix.Controllers
                 return NotFound();
             }
             star.Name = struct_star.name;
-            _context.Entry(star).State = EntityState.Modified;
+            _context.Stars.Update(star);
             try
             {
                  _context.SaveChanges();

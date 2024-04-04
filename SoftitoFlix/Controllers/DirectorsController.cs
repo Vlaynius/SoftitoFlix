@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Data;
@@ -61,24 +56,32 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "ContentAdmin")]
-        public void PutDirector(Director director)
+        public ActionResult PutDirector(int id,  string name)
         {
-            _context.Entry(director).State = EntityState.Modified;
-
+            Director? director = _context.Directors.Find(id);
+            if(director == null)
+            {
+                return NotFound();
+            }
+            director.Name = name;
+            _context.Directors.Update(director);
             try
             {
                  _context.SaveChanges();
             }
             catch (Exception)
             { }
+            return Ok();
         }
 
         // POST: api/Directors
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "ContentAdmin")]
-        public int PostDirector(Director director)
+        public int PostDirector(string name)
         {
+            Director director = new Director();
+            director.Name = name;
             _context.Directors.Add(director);
             _context.SaveChanges();
             return director.Id;

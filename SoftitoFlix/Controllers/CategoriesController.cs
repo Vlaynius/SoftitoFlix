@@ -53,8 +53,14 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "ContentAdmin")]
-        public void PutCategory( Category category)
+        public ActionResult PutCategory( int id,  string name)
         {
+            Category? category = _context.Categories.Find(id);
+            if(category == null)
+            {
+                return NotFound();
+            }
+            category.Name = name;
             _context.Categories.Update(category);
             try
             {
@@ -62,14 +68,17 @@ namespace SoftitoFlix.Controllers
             }
             catch (Exception)
             { }
+            return Ok();
         }
 
         // POST: api/Categories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "ContentAdmin")]
-        public int PostCategory(Category category)
+        public int PostCategory(string name)
         {
+            Category category = new Category();
+            category.Name = name;
             _context.Categories.Add(category);
             _context.SaveChanges();
             return category.Id;
