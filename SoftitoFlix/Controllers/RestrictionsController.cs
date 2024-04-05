@@ -2,6 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Data;
+using SoftitoFlix.Dto.Requests;
+using SoftitoFlix.Dto.Requests.Plan;
+using SoftitoFlix.Dto.Requests.Restriction;
+using SoftitoFlix.Dto.Response.Restriction;
 using SoftitoFlix.Models;
 
 namespace SoftitoFlix.Controllers
@@ -17,30 +21,42 @@ namespace SoftitoFlix.Controllers
             _context = context;
         }
 
-        public struct Restriction_struct
-        {
-            public byte id { get; set; }
-            public string name { get; set; }
-        }
-
         // GET: api/Restrictions
         [HttpGet]
-        public ActionResult<List<Restriction>> GetRestrictions()
+        public ActionResult<List<GetRestrictionResponse>> GetRestrictions()
         {
-            return _context.Restrictions.Where(p => p.Passive == false).ToList();
+            List<Restriction> restrictions = _context.Restrictions.Where(p => p.Passive == false).ToList();
+            if(restrictions == null)
+            {
+                return NotFound();
+            }
+            List<GetRestrictionResponse> response = new List<GetRestrictionResponse>();
+            foreach(Restriction restriction in restrictions)
+            {
+                GetRestrictionResponse getRestriction = new GetRestrictionResponse();
+                getRestriction.Id = restriction.Id;
+                getRestriction.Name = restriction.Name;
+                response.Add(getRestriction);
+            }
+
+            return response;
         }
 
         // GET: api/Restrictions/5
         [HttpGet("{id}")]
-        public ActionResult<Restriction> GetRestriction(byte id)
+        public ActionResult<GetRestrictionResponse> GetRestriction(GetRestrictionRequest request)
         {
-            Restriction? restriction = _context.Restrictions.Find(id);
+            Restriction? restriction = _context.Restrictions.Find(request.Id);
 
             if (restriction == null || restriction.Passive == true)
             {
                 return NotFound();
             }
-            return restriction;
+
+            GetRestrictionResponse response = new GetRestrictionResponse();
+            response.Id = restriction.Id;
+            response.Name = restriction.Name;
+            return response;
         }
 
         [HttpGet("restriction_id")]
@@ -57,17 +73,17 @@ namespace SoftitoFlix.Controllers
 
         // PUT: api/Restrictions/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut()]
+        [HttpPut("{id}")]
         [Authorize("ContentAdmin")]
-        public ActionResult PutRestriction(Restriction_struct restriction_struct)
+        public ActionResult PutRestriction(GetRestrictionRequest request)
         {
-            Restriction? restriction = _context.Restrictions.Find(restriction_struct.id);
+            Restriction? restriction = _context.Restrictions.Find(request.Id);
             if(restriction == null)
             {
                 return NotFound();
             }
 
-            restriction.Name = restriction_struct.name;
+            restriction.Name = request.Name;
 
             _context.Entry(restriction).State = EntityState.Modified;
             try
@@ -85,10 +101,10 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "ContentAdmin")]
-        public byte PostRestriction(string name)
+        public byte PostRestriction(PostRestrictionRequest request)
         {
             Restriction restriction = new Restriction();
-            restriction.Name = name;
+            restriction.Name = request.Name;
             restriction.Passive = false;
             _context.Restrictions.Add(restriction);
             try
@@ -105,9 +121,9 @@ namespace SoftitoFlix.Controllers
         // DELETE: api/Restrictions/5
         [HttpDelete("{id}")]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult DeleteRestriction(byte id)
+        public ActionResult DeleteRestriction(RestrictionIDRequest request)
         { 
-            Restriction? restriction = _context.Restrictions.Find(id);
+            Restriction? restriction = _context.Restrictions.Find(request.Id);
             if (restriction == null)
             {
                 return NotFound();
@@ -119,11 +135,11 @@ namespace SoftitoFlix.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}")]
+        [HttpPut()]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult ChangeActivationStatus( byte id)
+        public ActionResult ChangeActivationStatus(RestrictionIDRequest request)
         {
-            Restriction? restriction = _context.Restrictions.Find(id);
+            Restriction? restriction = _context.Restrictions.Find(request.Id);
             if(restriction == null)
             {
                 return NotFound();

@@ -35,6 +35,7 @@
     <None Remove="Dto\Requests\" />
     <None Remove="Dto\Requests\Plan\" />
     <None Remove="Dto\Responses\Plan\" />
+    <None Remove="Dto\Requests\Restriction\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
@@ -48,5 +49,6 @@
     <Folder Include="Dto\Requests\" />
     <Folder Include="Dto\Requests\Plan\" />
     <Folder Include="Dto\Responses\Plan\" />
+    <Folder Include="Dto\Requests\Restriction\" />
   </ItemGroup>
 </Project>
