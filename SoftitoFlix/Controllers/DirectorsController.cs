@@ -24,9 +24,22 @@ namespace SoftitoFlix.Controllers
         // GET: api/Directors
         [HttpGet]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult<List<Director>> GetDirectors()
+        public ActionResult<List<GetDirectorResponse>> GetDirectors()
         {
-            return _context.Directors.ToList();
+            List<Director> directors = _context.Directors.ToList();
+            if(directors == null)
+            {
+                return NotFound();
+            }
+            List<GetDirectorResponse> response = new List<GetDirectorResponse>();
+            foreach(Director director in directors)
+            {
+                GetDirectorResponse getDirector = new GetDirectorResponse();
+                getDirector.Id = director.Id;
+                getDirector.Name = director.Name;
+                response.Add(getDirector);
+            }
+            return response;
         }
 
         // GET: api/Directors/5
@@ -56,7 +69,7 @@ namespace SoftitoFlix.Controllers
                 return NotFound();
             }
             GetDirectorMediasResponse response = new GetDirectorMediasResponse();
-            Director? director = _context.Directors.Find(request.DirectorId);
+            Director? director = _context.Directors.Find(request.Id);
             GetDirectorResponse director1 = new GetDirectorResponse();
             director1.Id = director1.Id;
             director1.Name = director!.Name;

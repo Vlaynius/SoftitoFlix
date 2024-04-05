@@ -21,9 +21,22 @@ namespace SoftitoFlix.Controllers
         // GET: api/Categories
         [HttpGet]
         //[Authorize]
-        public ActionResult<List<Category>> GetCategories()
+        public ActionResult<List<GetCategoryResponse>> GetCategories()
         {
-            return  _context.Categories.ToList();
+            List<Category> categories= _context.Categories.ToList();
+            if(categories == null)
+            {
+                return NotFound();
+            }
+            List<GetCategoryResponse> response = new List<GetCategoryResponse>();
+            foreach (Category category in categories)
+            {
+                GetCategoryResponse getCategory = new GetCategoryResponse();
+                getCategory.Id = category.Id;
+                getCategory.Name = category.Name;
+                response.Add(getCategory);
+            }
+            return response;
         }
 
         // GET: api/Categories/5 *****

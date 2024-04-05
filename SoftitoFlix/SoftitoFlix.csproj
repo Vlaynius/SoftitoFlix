@@ -41,6 +41,7 @@
     <None Remove="Dto\Request\Episodes\" />
     <None Remove="Dto\Response\Episodes\" />
     <None Remove="Dto\Request\Media\" />
+    <None Remove="Dto\Response\Restriction\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
@@ -60,5 +61,6 @@
     <Folder Include="Dto\Request\Episodes\" />
     <Folder Include="Dto\Response\Episodes\" />
     <Folder Include="Dto\Request\Media\" />
+    <Folder Include="Dto\Response\Restriction\" />
   </ItemGroup>
 </Project>
