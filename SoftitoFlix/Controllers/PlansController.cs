@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Data;
+using SoftitoFlix.Dto.Requests.Plan;
+using SoftitoFlix.Dto.Responses.Plan;
 using SoftitoFlix.Models;
 
 namespace SoftitoFlix.Controllers
@@ -18,47 +20,58 @@ namespace SoftitoFlix.Controllers
             _context = context;
         }
 
-        public struct Plan_struct
-        {
-            public string name { get; set; }
-            public float price { get; set; }
-            public string resolution { get; set; }
-        }
-
         // GET: api/Plans
         [HttpGet]
-        public ActionResult<List<Plan>> GetPlans()
+        public ActionResult<List<GetPlanResponse>> GetPlans()
         {
-            return  _context.Plans.Where(p=>p.Passive == false).ToList();
+            List<Plan> plans = _context.Plans.Where(p => p.Passive == false).ToList();
+            if(plans == null)
+            {
+                return NotFound();
+            }
+            List<GetPlanResponse> response = new List<GetPlanResponse>();
+            foreach (Plan plan in plans)
+            {
+                GetPlanResponse getPlan = new GetPlanResponse();
+                getPlan.Name = plan.Name;
+                getPlan.Price = plan.Price;
+                getPlan.Resolution = plan.Resolution;
+                response.Add(getPlan);
+            }
+            return response;
         }
 
         // GET: api/Plans/5
         [HttpGet("{id}")]
-        public ActionResult<Plan> GetPlan(short id)
+        public ActionResult<GetPlanResponse> GetPlan(GetPlanIDRequest request)
         {
-            Plan? plan = _context.Plans.Find(id);
+            Plan? plan = _context.Plans.Find(request.Id);
 
             if (plan == null || plan.Passive == true)
             {
                 return NotFound();
             }
-            return plan;
+            GetPlanResponse response = new GetPlanResponse();
+            response.Name = plan.Name;
+            response.Price = plan.Price;
+            response.Resolution = plan.Resolution;
+            return response;
         }
 
         // PUT: api/Plans/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult PutPlan(short id, Plan_struct plan_struct)
+        public ActionResult PutPlan(short id, GetPlanRequest request)
         {
             Plan? plan = _context.Plans.Find(id);
             if(plan == null)
             {
                 return NotFound();
             }
-            plan.Name = plan_struct.name;
-            plan.Price = plan_struct.price;
-            plan.Resolution = plan_struct.resolution;
+            plan.Name = request.Name;
+            plan.Price = request.Price;
+            plan.Resolution = request.Resolution;
             _context.Entry(plan).State = EntityState.Modified;
 
             try
@@ -76,13 +89,13 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("Plan")]
         [Authorize(Roles = "ContentAdmin")]
-        public short PostPlan(Plan_struct plan_struct)
+        public short PostPlan(GetPlanRequest request)
         {
 
             Plan plan = new Plan();
-            plan.Name = plan_struct.name;
-            plan.Price = plan_struct.price;
-            plan.Resolution = plan_struct.resolution;
+            plan.Name = request.Name;
+            plan.Price = request.Price;
+            plan.Resolution = request.Resolution;
             plan.Passive = false;
             _context.Plans.Add(plan);
             _context.SaveChanges();
@@ -92,9 +105,9 @@ namespace SoftitoFlix.Controllers
         // DELETE: api/Plans/5
         [HttpDelete("{id}")]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult DeletePlan(short id)
+        public ActionResult DeletePlan(GetPlanIDRequest request)
         {
-            Plan? plan = _context.Plans.Find(id);
+            Plan? plan = _context.Plans.Find(request.Id);
             if (plan == null)
             {
                 return NotFound();
@@ -107,9 +120,9 @@ namespace SoftitoFlix.Controllers
 
         [HttpPut("Passive")]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult ChangeActivationStatus(short id)
+        public ActionResult ChangeActivationStatus(GetPlanIDRequest request)
         {
-            Plan? plan = _context.Plans.Find(id);
+            Plan? plan = _context.Plans.Find(request.Id);
             if (plan == null)
             {
                 return NotFound();
