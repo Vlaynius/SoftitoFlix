@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Data;
+using SoftitoFlix.Dto.Request.Directors;
+using SoftitoFlix.Dto.Response;
+using SoftitoFlix.Dto.Response.Directors;
 using SoftitoFlix.Models;
 
 namespace SoftitoFlix.Controllers
@@ -23,51 +26,69 @@ namespace SoftitoFlix.Controllers
         [Authorize(Roles = "ContentAdmin")]
         public ActionResult<List<Director>> GetDirectors()
         {
-            return  _context.Directors.ToList();
+            return _context.Directors.ToList();
         }
 
         // GET: api/Directors/5
         [HttpGet("{id}")]
         [Authorize]
-        public ActionResult<Director> GetDirector(int id)
+        public ActionResult<GetDirectorResponse> GetDirector(GetDirectorRequest request)
         {
-            Director? director =  _context.Directors.Find(id);
+            Director? director = _context.Directors.Find(request.Id);
             if (director == null)
             {
                 return NotFound();
             }
-            return director;
+            GetDirectorResponse response = new GetDirectorResponse();
+            response.Id = director.Id;
+            response.Name = director.Name;
+            return response;
         }
 
 
         [HttpGet("{Media_id}")]
         [Authorize]
-        public ActionResult<List<Media_Director>> Directors_Medias(int mediaId)
+        public ActionResult<GetDirectorMediasResponse> Director_Medias(GetDirectorMediasRequest request)
         {
-            List<Media_Director>? media_Director = _context.Media_Directors.Where(md => md.MediaId == mediaId).ToList();
+            List<Media_Director>? media_Director = _context.Media_Directors.Where(md => md.DirectorId == request.DirectorId).ToList();
             if (media_Director == null)
             {
                 return NotFound();
             }
-            return media_Director;
+            GetDirectorMediasResponse response = new GetDirectorMediasResponse();
+            Director? director = _context.Directors.Find(request.DirectorId);
+            GetDirectorResponse director1 = new GetDirectorResponse();
+            director1.Id = director1.Id;
+            director1.Name = director!.Name;
+            response.Director = director1;
+            foreach (Media_Director media_ in media_Director)
+            {
+                GetMediaResponse getMedia = new GetMediaResponse();
+                getMedia.Description = media_.Media!.Description;
+                getMedia.Name = media_.Media.Name;
+                getMedia.Rating = media_.Media.Rating;
+                getMedia.ReleaseDate = media_.Media.ReleaseDate;
+                response.Medias!.Add(getMedia);
+            }
+            return response;
         }
 
         // PUT: api/Directors/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult PutDirector(int id,  string name)
+        public ActionResult PutDirector(PutDirectorRequest request)
         {
-            Director? director = _context.Directors.Find(id);
-            if(director == null)
+            Director? director = _context.Directors.Find(request.Id);
+            if (director == null)
             {
                 return NotFound();
             }
-            director.Name = name;
-            _context.Directors.Update(director);
+            director.Name = request.Name;
+            _context.Update(director);
             try
             {
-                 _context.SaveChanges();
+                _context.SaveChanges();
             }
             catch (Exception)
             { }
@@ -78,14 +99,28 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "ContentAdmin")]
-        public int PostDirector(string name)
+        public int PostDirector(PostDirectorRequest request)
         {
             Director director = new Director();
-            director.Name = name;
+            director.Name = request.Name;
             _context.Directors.Add(director);
             _context.SaveChanges();
             return director.Id;
         }
 
+        [HttpDelete]
+        [Authorize(Roles = "ContentAdmin")]
+        public ActionResult DeleteDirector(DeleteDirectorRequest request)
+        {
+            Director? director = _context.Directors.Find(request.Id);
+            if(director == null)
+            {
+                return NotFound();
+            }
+
+            _context.Directors.Remove(director);
+            _context.SaveChanges();
+            return Ok();
+        }
     }
 }

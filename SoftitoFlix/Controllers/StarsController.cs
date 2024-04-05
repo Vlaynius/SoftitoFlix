@@ -116,7 +116,7 @@ namespace SoftitoFlix.Controllers
             }
             _context.Media_Stars.Remove(media_Star);
             _context.SaveChanges();
-            return NoContent();
+            return Ok();
         }
 
     }

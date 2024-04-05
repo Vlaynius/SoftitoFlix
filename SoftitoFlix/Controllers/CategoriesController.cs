@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SoftitoFlix.Data;
 using SoftitoFlix.Models;
+using SoftitoFlix.Dto.Response;
+using SoftitoFlix.Dto.Request;
 
 namespace SoftitoFlix.Controllers
 {
@@ -24,43 +26,59 @@ namespace SoftitoFlix.Controllers
             return  _context.Categories.ToList();
         }
 
-        // GET: api/Categories/5
+        // GET: api/Categories/5 *****
         [HttpGet("{id}")]
         //[Authorize]
-        public  ActionResult<Category> GetCategory(int id)
+        public  ActionResult<GetCategoryResponse> GetCategory(GetCategoryRequest request)
         {
-            Category? category =  _context.Categories.Find(id);
+            Category? category = _context.Categories.Where(c => c.Id == request.Id).FirstOrDefault();
+
             if (category == null)
             {
                 return NotFound();
             }
-            return category;
+            GetCategoryResponse response = new GetCategoryResponse();
+            response.Id = category.Id;
+            response.Name = category.Name;
+            return response;
         }
 
         [HttpGet("{CategoryId}")]
-        [Authorize]//bu category'nin medyaları
-        public ActionResult<List<Media_Category>> Category_Medias(int categoryId)
+        //[Authorize]
+        public ActionResult<GetCategoryMediasResponse> Category_Medias(GetCategoryRequest request)
         {
-            List<Media_Category>? media_Category = _context.Media_Categories.Where(mc => mc.CategoryId == categoryId).ToList();
-            if (media_Category == null)
+            
+            GetCategoryMediasResponse response = new GetCategoryMediasResponse();
+            response.Category = _context.Categories.Find(request.Id);
+            if(response.Category == null)
             {
                 return NotFound();
             }
-            return media_Category;
+            List<Media_Category>? media_Category = _context.Media_Categories.Where(mc => mc.CategoryId == request.Id).ToList();
+            foreach(Media_Category media_c in media_Category)
+            {
+                GetMediaResponse getMediaResponse = new GetMediaResponse();
+                getMediaResponse.Description = media_c.Media.Description;
+                getMediaResponse.Name = media_c.Media.Name;
+                getMediaResponse.Rating = media_c.Media.Rating;
+                getMediaResponse.ReleaseDate = media_c.Media.ReleaseDate;
+                response.medias!.Add(getMediaResponse);
+            }
+            return response;
         }
 
         // PUT: api/Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult PutCategory( int id,  string name)
+        public ActionResult PutCategory(PutCategoryRequest request)
         {
-            Category? category = _context.Categories.Find(id);
+            Category? category = _context.Categories.Find(request.Id);
             if(category == null)
             {
                 return NotFound();
             }
-            category.Name = name;
+            category.Name = request.Name;
             _context.Categories.Update(category);
             try
             {
@@ -75,10 +93,10 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "ContentAdmin")]
-        public int PostCategory(string name)
+        public int PostCategory(PostCategoryRequest request)
         {
             Category category = new Category();
-            category.Name = name;
+            category.Name = request.Name;
             _context.Categories.Add(category);
             _context.SaveChanges();
             return category.Id;
