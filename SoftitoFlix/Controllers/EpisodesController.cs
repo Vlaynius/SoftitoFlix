@@ -10,6 +10,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NuGet.Protocol.Plugins;
 using SoftitoFlix.Data;
+using SoftitoFlix.Dto.Request.Episodes;
+using SoftitoFlix.Dto.Request.Media;
+using SoftitoFlix.Dto.Response.Episodes;
 using SoftitoFlix.Models;
 
 namespace SoftitoFlix.Controllers
@@ -28,46 +31,67 @@ namespace SoftitoFlix.Controllers
             _signInManager = signInManager;
         }
 
-        public struct Episode_struct
-        {
-            public int MediaId { get; set; }
-            public byte SeasonNumber { get; set; }
-            public short EpisodeNumber { get; set; }
-            public DateTime ReleaseDate { get; set; }
-            public string Title { get; set; }
-            public string Description { get; set; }
-            public TimeSpan Duration { get; set; }
-        }
+        
 
         // GET: api/Episodes
         [HttpGet]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult<List<Episode>> GetEpisodes(int mediaId, byte seasonNumber)
+        public ActionResult<GetEpisodesResponse> GetEpisodes(GetEpisodesRequest request)
         {
-
-            return _context.Episodes.Where(e => e.MediaId == mediaId && e.SeasonNumber == seasonNumber).OrderBy(e => e.EpisodeNumber).ToList();
+            GetEpisodesResponse response = new GetEpisodesResponse();
+            List<Episode> episodes = _context.Episodes.Where(e => e.MediaId == request.MediaId && e.SeasonNumber == request.SeasonId).OrderBy(e => e.EpisodeNumber).ToList();
+            if(episodes == null)
+            {
+                return NotFound();
+            }
+            foreach(Episode episode in episodes)
+            {
+                GetEpisodeResponse response1 = new GetEpisodeResponse();
+                response1.Description = episode.Description;
+                response1.Duration = episode.Duration;
+                response1.EpisodeNumber = episode.EpisodeNumber;
+                response1.ReleaseDate = episode.ReleaseDate;
+                response1.SeasonNumber = episode.SeasonNumber;
+                response1.Title = episode.Title;
+                response1.Media!.Description = episode.Media!.Description;
+                response1.Media.Name = episode.Media.Name;
+                response1.Media.Rating = episode.Media.Rating;
+                response1.Media.ReleaseDate = episode.Media.ReleaseDate;
+                response.Episodes!.Add(response1);
+            }
+            return response;
         }
 
         // GET: api/Episodes/5
         [HttpGet("{id}")]
         [Authorize]
-        public ActionResult<Episode> GetEpisode(long id)
+        public ActionResult<GetEpisodeResponse> GetEpisode(EpisodeID_Request request)
         {
-            Episode? episode = _context.Episodes.Find(id);
+            Episode? episode = _context.Episodes.Find(request.Id);
             if (episode == null)
             {
                 return NotFound();
             }
-            return episode;
+            GetEpisodeResponse response = new GetEpisodeResponse();
+            response.Description = episode.Description;
+            response.Duration = episode.Duration;
+            response.EpisodeNumber = episode.EpisodeNumber;
+            response.ReleaseDate = episode.ReleaseDate;
+            response.SeasonNumber = episode.SeasonNumber;
+            response.Title = episode.Title;
+            response.Media!.Description = episode.Media!.Description;
+            response.Media.Name = episode.Media.Name;
+            response.Media.Rating = episode.Media.Rating;
+            response.Media.ReleaseDate = episode.Media.ReleaseDate;
+            return response;
         }
 
         [HttpGet("Watch")]
         [Authorize]
-        public ActionResult Watch(long id)
+        public ActionResult Watch(EpisodeID_Request request)
         {
-            ApplicationUser user = _signInManager.UserManager.GetUserAsync(User).Result!;
             User_Watched userWatched = new User_Watched();
-            Episode? episode = _context.Episodes.Find(id);
+            Episode? episode = _context.Episodes.Find(request.Id);
 
             if(episode == null)
             {
@@ -76,8 +100,8 @@ namespace SoftitoFlix.Controllers
 
             try
             {
-                userWatched.UserId = long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);//Giriş yapan kullanıcının idsini longa çevirim UserId'ye eşitledik
-                userWatched.EpisodeId = id;
+                userWatched.UserId = long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                userWatched.EpisodeId = request.Id;
                 _context.User_Watcheds.Add(userWatched);
                 episode.ViewCount++;
                 _context.Episodes.Update(episode);
@@ -92,10 +116,10 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult PutEpisode(Episode_struct episode_struct)
+        public ActionResult PutEpisode(PutEpisodeRequest request)
         {
-            Episode? episode = _context.Episodes.Where(e => e.MediaId == episode_struct.MediaId).Where(e => e.SeasonNumber == episode_struct.SeasonNumber)
-                .Where(e => e.EpisodeNumber == episode_struct.EpisodeNumber).FirstOrDefault();
+            Episode? episode = _context.Episodes.Where(e => e.MediaId == request.MediaId).Where(e => e.SeasonNumber == request.SeasonNumber)
+                .Where(e => e.EpisodeNumber == request.EpisodeNumber).FirstOrDefault();
             if(episode == null)
             {
                 return NotFound();
@@ -114,17 +138,17 @@ namespace SoftitoFlix.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "ContentAdmin")]
-        public long PostEpisode(Episode_struct episode_struct)
+        public long PostEpisode(PostEpisodeRequest request)
         {
             Episode episode = new Episode();
-            episode.Description = episode_struct.Description;
-            episode.Duration = episode_struct.Duration;
-            episode.EpisodeNumber = episode_struct.EpisodeNumber;
-            episode.MediaId = episode_struct.MediaId;
+            episode.Description = request.Description;
+            episode.Duration = request.Duration;
+            episode.EpisodeNumber = request.EpisodeNumber;
+            episode.MediaId = request.MediaId;
             episode.Passive = false;
-            episode.ReleaseDate = episode_struct.ReleaseDate;
-            episode.SeasonNumber = episode_struct.SeasonNumber;
-            episode.Title = episode_struct.Title;
+            episode.ReleaseDate = request.ReleaseDate;
+            episode.SeasonNumber = request.SeasonNumber;
+            episode.Title = request.Title;
             episode.ViewCount = 0;
             _context.Episodes.Add(episode);
              _context.SaveChanges();
@@ -134,9 +158,9 @@ namespace SoftitoFlix.Controllers
         // DELETE: api/Episodes/5
         [HttpDelete("{id}")]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult DeleteEpisode(long id)
+        public ActionResult DeleteEpisode(EpisodeID_Request request)
         {
-            Episode? episode = _context.Episodes.Find(id);
+            Episode? episode = _context.Episodes.Find(request.Id);
             if (episode == null)
             {
                 return NotFound();
@@ -148,9 +172,9 @@ namespace SoftitoFlix.Controllers
 
         [HttpPut("Activate")]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult ActivateEpisode(long id)
+        public ActionResult ActivateEpisode(EpisodeID_Request request)
         {
-            Episode? episode = _context.Episodes.Find(id);
+            Episode? episode = _context.Episodes.Find(request.Id);
             if (episode == null)
             {
                 return NotFound();
@@ -162,12 +186,12 @@ namespace SoftitoFlix.Controllers
 
         [HttpPost("Favorite")]
         [Authorize]
-        public void AddtoFavorite(int mediaId)
+        public void AddtoFavorite(MediaID_Request request)
         {
             try
             {
                 User_Favorite user_Favorite = new User_Favorite();
-                user_Favorite.MediaId = mediaId;
+                user_Favorite.MediaId = request.Id;
                 user_Favorite.UserId = long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
                 _context.User_Favorites.Add(user_Favorite);
                 _context.SaveChanges();
@@ -178,10 +202,10 @@ namespace SoftitoFlix.Controllers
 
         [HttpDelete("Favorite")]
         [Authorize]
-        public ActionResult RemovefromFavorite(int mediaId)
+        public ActionResult RemovefromFavorite(MediaID_Request request)
         {
             long userId = long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            User_Favorite? user_Favorite = _context.User_Favorites.Where(m => m.UserId == userId).FirstOrDefault(m => m.MediaId == mediaId);
+            User_Favorite? user_Favorite = _context.User_Favorites.Where(m => m.UserId == userId).FirstOrDefault(m => m.MediaId == request.Id);
             if(user_Favorite == null)
             {
                 return NotFound();

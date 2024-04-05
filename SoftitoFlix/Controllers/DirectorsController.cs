@@ -32,7 +32,7 @@ namespace SoftitoFlix.Controllers
         // GET: api/Directors/5
         [HttpGet("{id}")]
         [Authorize]
-        public ActionResult<GetDirectorResponse> GetDirector(GetDirectorRequest request)
+        public ActionResult<GetDirectorResponse> GetDirector(DirectorID_Request request)
         {
             Director? director = _context.Directors.Find(request.Id);
             if (director == null)
@@ -48,9 +48,9 @@ namespace SoftitoFlix.Controllers
 
         [HttpGet("{Media_id}")]
         [Authorize]
-        public ActionResult<GetDirectorMediasResponse> Director_Medias(GetDirectorMediasRequest request)
+        public ActionResult<GetDirectorMediasResponse> Director_Medias(DirectorID_Request request)
         {
-            List<Media_Director>? media_Director = _context.Media_Directors.Where(md => md.DirectorId == request.DirectorId).ToList();
+            List<Media_Director>? media_Director = _context.Media_Directors.Where(md => md.DirectorId == request.Id).ToList();
             if (media_Director == null)
             {
                 return NotFound();
@@ -110,7 +110,7 @@ namespace SoftitoFlix.Controllers
 
         [HttpDelete]
         [Authorize(Roles = "ContentAdmin")]
-        public ActionResult DeleteDirector(DeleteDirectorRequest request)
+        public ActionResult DeleteDirector(DirectorID_Request request)
         {
             Director? director = _context.Directors.Find(request.Id);
             if(director == null)

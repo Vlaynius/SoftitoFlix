@@ -38,6 +38,9 @@
     <None Remove="Dto\Request\Directors\" />
     <None Remove="Dto\Response\Directors\" />
     <None Remove="Dto\Response\Media\" />
+    <None Remove="Dto\Request\Episodes\" />
+    <None Remove="Dto\Response\Episodes\" />
+    <None Remove="Dto\Request\Media\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
@@ -54,5 +57,8 @@
     <Folder Include="Dto\Request\Directors\" />
     <Folder Include="Dto\Response\Directors\" />
     <Folder Include="Dto\Response\Media\" />
+    <Folder Include="Dto\Request\Episodes\" />
+    <Folder Include="Dto\Response\Episodes\" />
+    <Folder Include="Dto\Request\Media\" />
   </ItemGroup>
 </Project>
