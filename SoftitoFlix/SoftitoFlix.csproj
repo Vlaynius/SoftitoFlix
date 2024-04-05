@@ -31,17 +31,12 @@
     <None Remove="Models\Identity\" />
     <None Remove="Models\Entity\" />
     <None Remove="Dto\" />
-    <None Remove="Dto\Request\" />
-    <None Remove="Dto\Response\" />
     <None Remove="Dto\Request\Categories\" />
-    <None Remove="Dto\Response\Categories\" />
     <None Remove="Dto\Request\Directors\" />
-    <None Remove="Dto\Response\Directors\" />
-    <None Remove="Dto\Response\Media\" />
     <None Remove="Dto\Request\Episodes\" />
-    <None Remove="Dto\Response\Episodes\" />
     <None Remove="Dto\Request\Media\" />
-    <None Remove="Dto\Response\Restriction\" />
+    <None Remove="Dto\Responses\" />
+    <None Remove="Dto\Requests\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
@@ -51,16 +46,11 @@
     <Folder Include="Models\Identity\" />
     <Folder Include="Models\Entity\" />
     <Folder Include="Dto\" />
-    <Folder Include="Dto\Request\" />
-    <Folder Include="Dto\Response\" />
     <Folder Include="Dto\Request\Categories\" />
-    <Folder Include="Dto\Response\Categories\" />
     <Folder Include="Dto\Request\Directors\" />
-    <Folder Include="Dto\Response\Directors\" />
-    <Folder Include="Dto\Response\Media\" />
     <Folder Include="Dto\Request\Episodes\" />
-    <Folder Include="Dto\Response\Episodes\" />
     <Folder Include="Dto\Request\Media\" />
-    <Folder Include="Dto\Response\Restriction\" />
+    <Folder Include="Dto\Responses\" />
+    <Folder Include="Dto\Requests\" />
   </ItemGroup>
 </Project>
