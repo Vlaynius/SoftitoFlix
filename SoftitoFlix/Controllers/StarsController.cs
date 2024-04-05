@@ -22,18 +22,6 @@ namespace SoftitoFlix.Controllers
             _context = context;
         }
 
-        public struct Star_struct
-        {
-            public int id { get; set; }
-            public string name { get; set; }
-        }
-
-        public struct Media_star
-        {
-            public int mediaId { get; set; }
-            public int starId { get; set; }
-        }
-
         // GET: api/Stars
         [HttpGet]
         [Authorize]

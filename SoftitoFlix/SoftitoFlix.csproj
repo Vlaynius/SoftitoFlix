@@ -36,6 +36,14 @@
     <None Remove="Dto\Requests\Plan\" />
     <None Remove="Dto\Responses\Plan\" />
     <None Remove="Dto\Requests\Restriction\" />
+    <None Remove="Dto\Requests\Star\" />
+    <None Remove="Dto\Responses\Star\" />
+    <None Remove="Dto\Requests\Roles\" />
+    <None Remove="Dto\Responses\Roles\" />
+    <None Remove="Dto\Requests\User_Plans\" />
+    <None Remove="Dto\Responses\User_Plans\" />
+    <None Remove="Dto\Requests\User\" />
+    <None Remove="Dto\Responses\User\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
@@ -50,5 +58,13 @@
     <Folder Include="Dto\Requests\Plan\" />
     <Folder Include="Dto\Responses\Plan\" />
     <Folder Include="Dto\Requests\Restriction\" />
+    <Folder Include="Dto\Requests\Star\" />
+    <Folder Include="Dto\Responses\Star\" />
+    <Folder Include="Dto\Requests\Roles\" />
+    <Folder Include="Dto\Responses\Roles\" />
+    <Folder Include="Dto\Requests\User_Plans\" />
+    <Folder Include="Dto\Responses\User_Plans\" />
+    <Folder Include="Dto\Requests\User\" />
+    <Folder Include="Dto\Responses\User\" />
   </ItemGroup>
 </Project>
