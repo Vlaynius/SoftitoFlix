@@ -20,7 +20,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Categories
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         public ActionResult<List<GetCategoryResponse>> GetCategories()
         {
             List<Category> categories= _context.Categories.ToList();
@@ -41,7 +41,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Categories/5 *****
         [HttpGet("{id}")]
-        //[Authorize]
+        [Authorize]
         public  ActionResult<GetCategoryResponse> GetCategory(GetCategoryRequest request)
         {
             Category? category = _context.Categories.Where(c => c.Id == request.Id).FirstOrDefault();
@@ -57,7 +57,7 @@ namespace SoftitoFlix.Controllers
         }
 
         [HttpGet("{CategoryId}")]
-        //[Authorize]
+        [Authorize]
         public ActionResult<GetCategoryMediasResponse> Category_Medias(GetCategoryRequest request)
         {
             

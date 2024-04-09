@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SoftitoFlix.Data;
+using SoftitoFlix.Dto.Requests.User_Plans;
+using SoftitoFlix.Dto.Responses.User_Plans;
 using SoftitoFlix.Models;
 
 namespace SoftitoFlix.Controllers
@@ -20,12 +22,7 @@ namespace SoftitoFlix.Controllers
             _signInManager = signInManager;
         }
 
-        public struct Plan_puchase
-        {
-            public string eMail { get; set; }
-            public short planId { get; set; }
-        }
-
+        
         // GET: api/User_Plans
         [HttpGet("All")]
         [Authorize("Administrator")]
@@ -41,15 +38,28 @@ namespace SoftitoFlix.Controllers
         // GET: api/User_Plans/5
         [HttpGet]
         [Authorize]
-        public ActionResult<List<User_Plan>> Users_Purchases()
+        public ActionResult<List<UserPlanResponse>> Users_Purchases()
         {
             long userid = long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            ApplicationUser user = _signInManager.UserManager.FindByIdAsync(userid.ToString()).Result!;
             List<User_Plan> user_Plan = _context.User_Plans.Where(p=>p.UserId == userid).ToList();
             if (user_Plan == null)
             {
                 return NotFound();
             }
-            return user_Plan;
+            List<UserPlanResponse> response = new List<UserPlanResponse>();
+            foreach (User_Plan plan in user_Plan)
+            {
+                UserPlanResponse userPlanResponse = new UserPlanResponse();
+                userPlanResponse.StartDate = plan.StartDate;
+                userPlanResponse.EndDate = plan.EndDate;
+                userPlanResponse.PlanCost = plan.Plan.Price;
+                userPlanResponse.PlanName = plan.Plan.Name;
+                userPlanResponse.Email = user.Email;
+                userPlanResponse.Name = user.Name;
+                response.Add(userPlanResponse);
+            }
+            return response;
         }
 
         [HttpGet("{id}")]
@@ -67,7 +77,7 @@ namespace SoftitoFlix.Controllers
         // POST: api/User_Plans
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public ActionResult PostUser_Plan(Plan_puchase plan_Puchase)
+        public ActionResult PostUser_Plan(Plan_Purchase plan_Puchase)
         {
             Plan plan = _context.Plans.Find(plan_Puchase.planId)!;
             ApplicationUser applicationUser = _signInManager.UserManager.FindByEmailAsync(plan_Puchase.eMail).Result!;

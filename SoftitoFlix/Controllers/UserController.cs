@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using SoftitoFlix.Data;
 using SoftitoFlix.Models;
 using System.Security.Claims;
+using SoftitoFlix.Dto.Requests.User;
+using SoftitoFlix.Dto.Responses.User;
 
 namespace SoftitoFlix.Controllers
 {
@@ -23,39 +25,17 @@ namespace SoftitoFlix.Controllers
             _context = context;
         }
 
-        public struct LogInModel
-        {
-            public string userName { get; set; }
-            public string password { get; set; }
-        }
-
         public struct Movie
         {
             public Media media { get; set; }
             public int ViewCount { get; set; }
         }
 
-        public struct ChangePassword
-        {
-            public string UserName { get; set; }
-            public string CurrentPassword { get; set; }
-            public string NewPassword { get; set; }
-        }
-
-        public struct UserStruct
-        {
-            public string userName { get; set; }
-            public string email { get; set; } 
-            public string phoneNumber { get; set; } 
-            public DateTime BirthDate { get; set; }
-            public string name { get; set; } 
-            public string password { get; set; }
-        }
 
         // GET: api/User
         [HttpGet]
         [Authorize(Roles = "Administrator")]
-        public  ActionResult<List<ApplicationUser>> GetUsers(bool IncludePassiveUsers = true, bool IncludeDeletedUsers = true)
+        public  ActionResult<List<GetUserResponse>> GetUsers(bool IncludePassiveUsers = true, bool IncludeDeletedUsers = true)
         {
             IQueryable<ApplicationUser> users = _signInManager.UserManager.Users;
             if (IncludePassiveUsers == false)
@@ -66,17 +46,28 @@ namespace SoftitoFlix.Controllers
             {
                 users = users.Where(u => u.Deleted == false);
             }
-            return users.AsNoTracking().ToList();
+            List<ApplicationUser> list = users.AsNoTracking().ToList();
+            List<GetUserResponse> response = new List<GetUserResponse>();
+            foreach (ApplicationUser item in list)
+            {
+                GetUserResponse getUserResponse = new GetUserResponse();
+                getUserResponse.BirthDate = item.BirthDate;
+                getUserResponse.Phone = item.PhoneNumber;
+                getUserResponse.Email = item.Email;
+                getUserResponse.Name = item.Name;
+                response.Add(getUserResponse);
+            }
+            return response;
         }
 
         // GET: api/User/5
         [HttpGet("{id}")]
         [Authorize]
-        public  ActionResult<ApplicationUser> GetApplicationUser(long id)
+        public  ActionResult<GetUserResponse> GetApplicationUser(GetUserID_Request request)
         {
             if(User.IsInRole("Administrator") == false)
             {
-                if(User.FindFirstValue(ClaimTypes.NameIdentifier) == id.ToString() == false)
+                if(User.FindFirstValue(ClaimTypes.NameIdentifier) == request.UserID.ToString() == false)
                 {
                     return Unauthorized();
                 }
@@ -85,19 +76,24 @@ namespace SoftitoFlix.Controllers
             {
                 return NotFound();
             }
-            ApplicationUser? applicationUser = _signInManager.UserManager.FindByIdAsync(id.ToString()).Result;
+            ApplicationUser? applicationUser = _signInManager.UserManager.FindByIdAsync(request.UserID.ToString()).Result;
             if (applicationUser == null)
             {
                 return NotFound();
             }
-            return applicationUser;
+            GetUserResponse response = new GetUserResponse();
+            response.BirthDate = applicationUser.BirthDate;
+            response.Phone = applicationUser.PhoneNumber;
+            response.Email = applicationUser.Email;
+            response.Name = applicationUser.Name;
+            return response;
         }
 
         // PUT: api/User/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize]
-        public ActionResult PutApplicationUser(long id, UserStruct userStruct)
+        public ActionResult PutApplicationUser(long id, GetUserRequest request)
         {
             if (User.IsInRole("CustomerRepresentative") == false)
             {
@@ -111,11 +107,11 @@ namespace SoftitoFlix.Controllers
             {
                 return NotFound();
             }
-            user.Name = userStruct.name;
-            user.BirthDate = userStruct.BirthDate;
-            user.Email = userStruct.email;
-            user.PhoneNumber = userStruct.phoneNumber;
-            user.UserName = userStruct.userName;
+            user.Name = request.name;
+            user.BirthDate = request.BirthDate;
+            user.Email = request.email;
+            user.PhoneNumber = request.phoneNumber;
+            user.UserName = request.userName;
             _signInManager.UserManager.UpdateAsync(user).Wait();
             return Ok();
         }
@@ -123,21 +119,21 @@ namespace SoftitoFlix.Controllers
         // POST: api/User
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public ActionResult<object> PostApplicationUser(UserStruct userStruct)
+        public ActionResult<object> PostApplicationUser(GetUserRequest request)
         {
             if(User.Identity!.IsAuthenticated == true)
             {
                 return BadRequest();
             }
             ApplicationUser applicationUser = new ApplicationUser();
-            applicationUser.UserName = userStruct.userName;
-            applicationUser.PhoneNumber = userStruct.phoneNumber;
-            applicationUser.Email = userStruct.email;
-            applicationUser.BirthDate = userStruct.BirthDate;
+            applicationUser.UserName = request.userName;
+            applicationUser.PhoneNumber = request.phoneNumber;
+            applicationUser.Email = request.email;
+            applicationUser.BirthDate = request.BirthDate;
             applicationUser.Passive = false;
             applicationUser.Deleted = false;
 
-            IdentityResult IdentityResult =_signInManager.UserManager.CreateAsync(applicationUser, userStruct.password).Result;
+            IdentityResult IdentityResult =_signInManager.UserManager.CreateAsync(applicationUser, request.password).Result;
             if(IdentityResult != IdentityResult.Success)
             {
                 return IdentityResult.Errors.FirstOrDefault()!.Description;
@@ -148,16 +144,16 @@ namespace SoftitoFlix.Controllers
         // DELETE: api/User/5
         [HttpDelete("{id}")]
         [Authorize]
-        public ActionResult DeleteApplicationUser(long id)
+        public ActionResult DeleteApplicationUser(GetUserID_Request request)
         {
             if((User.IsInRole("Administrator" ) || User.IsInRole("CustomerRepresentative")) == false)
             {
-                if (User.FindFirstValue(ClaimTypes.NameIdentifier) == id.ToString() == false)
+                if (User.FindFirstValue(ClaimTypes.NameIdentifier) == request.UserID.ToString() == false)
                 {
                     return Unauthorized();
                 }
             }
-            ApplicationUser? applicationUser = _signInManager.UserManager.FindByIdAsync(id.ToString()).Result;
+            ApplicationUser? applicationUser = _signInManager.UserManager.FindByIdAsync(request.UserID.ToString()).Result;
             if (applicationUser == null)
             {
                 return NotFound();
@@ -167,18 +163,6 @@ namespace SoftitoFlix.Controllers
             return NoContent();
         }
 
-        [HttpPut("Activate")]
-        public ActionResult ActivateApplicationUser(long id)
-        {
-            ApplicationUser? applicationUser = _signInManager.UserManager.FindByIdAsync(id.ToString()).Result;
-            if (applicationUser == null)
-            {
-                return NotFound();
-            }
-            applicationUser.Passive = false;
-            _signInManager.UserManager.UpdateAsync(applicationUser).Wait();
-            return NoContent();
-        }
 
         [Authorize(Roles = "Administrator")]
         [HttpPost("SetPassword")]

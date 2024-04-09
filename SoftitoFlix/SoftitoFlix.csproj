@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
+
+  <ItemGroup>
+    <Compile Remove="Dto\Responses\Roles\**" />
+    <Content Remove="Dto\Responses\Roles\**" />
+    <EmbeddedResource Remove="Dto\Responses\Roles\**" />
+    <None Remove="Dto\Responses\Roles\**" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.17" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
@@ -52,19 +59,8 @@
     <Folder Include="Models\CrossTables\" />
     <Folder Include="Models\Identity\" />
     <Folder Include="Models\Entity\" />
-    <Folder Include="Dto\" />
-    <Folder Include="Dto\Responses\" />
-    <Folder Include="Dto\Requests\" />
     <Folder Include="Dto\Requests\Plan\" />
     <Folder Include="Dto\Responses\Plan\" />
     <Folder Include="Dto\Requests\Restriction\" />
-    <Folder Include="Dto\Requests\Star\" />
-    <Folder Include="Dto\Responses\Star\" />
-    <Folder Include="Dto\Requests\Roles\" />
-    <Folder Include="Dto\Responses\Roles\" />
-    <Folder Include="Dto\Requests\User_Plans\" />
-    <Folder Include="Dto\Responses\User_Plans\" />
-    <Folder Include="Dto\Requests\User\" />
-    <Folder Include="Dto\Responses\User\" />
   </ItemGroup>
 </Project>

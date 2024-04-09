@@ -226,7 +226,7 @@ namespace SoftitoFlix.Controllers
         }
 
         [HttpPost("Media_Restriction")]
-        //[Authorize("ContentAdmin")]
+        [Authorize("ContentAdmin")]
         public bool PostMedia_Restriction(PostMediaRestriction_Request request)
         {
             Media_Restriction media_Restriction = new Media_Restriction();
@@ -238,7 +238,7 @@ namespace SoftitoFlix.Controllers
         }
 
         [HttpPost("Media_Director")]
-        //[Authorize("ContentAdmin")]
+        [Authorize("ContentAdmin")]
         public bool PostMedia_Director(PostMediaDirector_Request request)
         {
             Media_Director media_Director = new Media_Director();

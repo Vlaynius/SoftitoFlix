@@ -23,6 +23,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Restrictions
         [HttpGet]
+        [Authorize]
         public ActionResult<List<GetRestrictionResponse>> GetRestrictions()
         {
             List<Restriction> restrictions = _context.Restrictions.Where(p => p.Passive == false).ToList();
@@ -44,6 +45,7 @@ namespace SoftitoFlix.Controllers
 
         // GET: api/Restrictions/5
         [HttpGet("{id}")]
+        [Authorize]
         public ActionResult<GetRestrictionResponse> GetRestriction(GetRestrictionRequest request)
         {
             Restriction? restriction = _context.Restrictions.Find(request.Id);
